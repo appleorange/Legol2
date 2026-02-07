@@ -776,41 +776,113 @@ const Chat = () => {
                             onChange={handleFileSelect}
                             style={{ display: 'none' }}
                         />
-                        <button
-                            onClick={handleFileButtonClick}
-                            style={{
-                                width: '44px',
-                                height: '44px',
-                                borderRadius: '12px',
-                                border: 'none',
-                                background: 'transparent',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                transition: 'all 0.2s ease'
-                            }}
-                        >
-                            <Paperclip size={24} color="#003366" />
-                        </button>
+                        {/* Send Button (frosted glass pill) */}
                         <button
                             onClick={handleSend}
                             disabled={isLoading || (!query.trim() && uploadedFiles.length === 0)}
                             style={{
-                                width: '44px',
-                                height: '44px',
-                                borderRadius: '12px',
-                                border: 'none',
-                                background: 'transparent',
+                                position: 'relative',
+                                width: '54px',
+                                height: '42px',
+                                borderRadius: '100px',
+                                border: (query.trim() || uploadedFiles.length > 0)
+                                    ? '1px solid rgba(255, 255, 255, 0.35)'
+                                    : '1px solid rgba(0, 51, 102, 0.08)',
+                                background: (query.trim() || uploadedFiles.length > 0)
+                                    ? 'linear-gradient(160deg, rgba(51, 102, 153, 0.75) 0%, rgba(0, 51, 102, 0.85) 100%)'
+                                    : 'rgba(0, 51, 102, 0.06)',
+                                backdropFilter: 'blur(16px)',
+                                WebkitBackdropFilter: 'blur(16px)',
                                 cursor: (query.trim() || uploadedFiles.length > 0) ? 'pointer' : 'default',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                transition: 'all 0.2s ease',
-                                opacity: (query.trim() || uploadedFiles.length > 0) ? 0.8 : 0.35
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                flexShrink: 0,
+                                overflow: 'hidden',
+                                boxShadow: (query.trim() || uploadedFiles.length > 0)
+                                    ? '0 4px 16px rgba(0, 51, 102, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 0 0 0.5px rgba(0, 51, 102, 0.15)'
+                                    : 'inset 0 1px 1px rgba(255, 255, 255, 0.3)'
+                            }}
+                            onMouseEnter={(e) => {
+                                if (query.trim() || uploadedFiles.length > 0) {
+                                    e.currentTarget.style.transform = 'scale(1.07)';
+                                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 51, 102, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.3), 0 0 0 0.5px rgba(0, 51, 102, 0.2)';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'scale(1)';
+                                e.currentTarget.style.boxShadow = (query.trim() || uploadedFiles.length > 0)
+                                    ? '0 4px 16px rgba(0, 51, 102, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 0 0 0.5px rgba(0, 51, 102, 0.15)'
+                                    : 'inset 0 1px 1px rgba(255, 255, 255, 0.3)';
                             }}
                         >
-                            <Send size={24} color="#003366" />
+                            {/* Glass highlight overlay */}
+                            <div style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: '10%',
+                                right: '10%',
+                                height: '45%',
+                                borderRadius: '0 0 50% 50%',
+                                background: (query.trim() || uploadedFiles.length > 0)
+                                    ? 'linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 100%)'
+                                    : 'linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 100%)',
+                                pointerEvents: 'none'
+                            }} />
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={(query.trim() || uploadedFiles.length > 0) ? '#FFFFFF' : 'rgba(0,51,102,0.3)'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: 'relative', zIndex: 1 }}>
+                                <line x1="12" y1="19" x2="12" y2="5" />
+                                <polyline points="5 12 12 5 19 12" />
+                            </svg>
+                        </button>
+                        {/* Attach Files Button (frosted glass) */}
+                        <button
+                            onClick={handleFileButtonClick}
+                            style={{
+                                position: 'relative',
+                                width: '42px',
+                                height: '42px',
+                                borderRadius: '14px',
+                                border: '1px solid rgba(0, 51, 102, 0.12)',
+                                background: 'rgba(0, 51, 102, 0.04)',
+                                backdropFilter: 'blur(16px)',
+                                WebkitBackdropFilter: 'blur(16px)',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                flexShrink: 0,
+                                marginLeft: '6px',
+                                overflow: 'hidden',
+                                boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 2px 8px rgba(0, 51, 102, 0.06)'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = 'rgba(0, 51, 102, 0.1)';
+                                e.currentTarget.style.borderColor = 'rgba(0, 51, 102, 0.25)';
+                                e.currentTarget.style.transform = 'scale(1.06)';
+                                e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(255, 255, 255, 0.5), 0 4px 14px rgba(0, 51, 102, 0.12)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = 'rgba(0, 51, 102, 0.04)';
+                                e.currentTarget.style.borderColor = 'rgba(0, 51, 102, 0.12)';
+                                e.currentTarget.style.transform = 'scale(1)';
+                                e.currentTarget.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 2px 8px rgba(0, 51, 102, 0.06)';
+                            }}
+                            title="Attach files"
+                        >
+                            {/* Glass highlight overlay */}
+                            <div style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: '15%',
+                                right: '15%',
+                                height: '40%',
+                                borderRadius: '0 0 50% 50%',
+                                background: 'linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 100%)',
+                                pointerEvents: 'none'
+                            }} />
+                            <Paperclip size={18} color="#003366" style={{ position: 'relative', zIndex: 1 }} />
                         </button>
                     </div>
                 </div>
