@@ -104,7 +104,10 @@ const Navbar = () => {
                 boxSizing: 'border-box'
             }}
         >
-            <div style={{ fontSize: '24px', fontWeight: '700', color: '#003366' }}>LEGOL</div>
+            <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+                <img src="/legol-icon.png" alt="LEGOL" style={{ height: '28px' }} />
+                <span style={{ fontSize: '24px', fontWeight: '700', color: '#003366' }}>LEGOL</span>
+            </div>
 
             <div style={{
                 background: 'rgba(230, 235, 240, 0.6)',
@@ -542,6 +545,132 @@ const StatementSection = () => {
     );
 };
 
+/* ─── CTA Section (end of page — invite to sign up / login) ─── */
+const CTASection = () => {
+    const ref = useRef(null);
+    const navigate = useNavigate();
+    const isInView = useInView(ref, { once: true, amount: 0.3 });
+
+    return (
+        <section ref={ref} style={{
+            padding: '140px 64px 120px',
+            background: 'linear-gradient(180deg, #FFFFFF 0%, #F4F6FA 100%)',
+            position: 'relative',
+            overflow: 'hidden'
+        }}>
+            {/* Soft background glow */}
+            <div style={{
+                position: 'absolute', top: '15%', left: '50%', transform: 'translateX(-50%)',
+                width: '60vw', height: '50vh',
+                background: 'radial-gradient(circle, rgba(0,51,102,0.05) 0%, transparent 70%)',
+                filter: 'blur(80px)', pointerEvents: 'none'
+            }} />
+
+            <div style={{
+                maxWidth: '680px', margin: '0 auto', textAlign: 'center',
+                position: 'relative', zIndex: 2
+            }}>
+                {/* Tag */}
+                <motion.span
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                    style={{
+                        fontSize: '11px', fontWeight: '600', letterSpacing: '3px',
+                        textTransform: 'uppercase', color: 'rgba(0,51,102,0.3)',
+                        display: 'block', marginBottom: '24px'
+                    }}
+                >
+                    Get Started
+                </motion.span>
+
+                {/* Headline */}
+                <div style={{ marginBottom: '20px' }}>
+                    {['Ready to simplify', 'your immigration journey?'].map((line, i) => (
+                        <div key={i} style={{ overflow: 'hidden' }}>
+                            <motion.div
+                                initial={{ y: '110%' }}
+                                animate={isInView ? { y: 0 } : {}}
+                                transition={{ duration: 0.85, delay: 0.2 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                            >
+                                <span style={{
+                                    fontSize: '48px', fontWeight: '500', color: '#003366',
+                                    lineHeight: '1.15', letterSpacing: '-1.5px', display: 'block'
+                                }}>
+                                    {line}
+                                </span>
+                            </motion.div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Subtitle */}
+                <motion.p
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.6, delay: 0.45 }}
+                    style={{
+                        fontSize: '17px', color: '#64748b', lineHeight: '1.7',
+                        maxWidth: '460px', margin: '0 auto 40px'
+                    }}
+                >
+                    Join thousands of students already navigating visas, documents, and deadlines with confidence.
+                </motion.p>
+
+                {/* Buttons */}
+                <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.5, delay: 0.6 }}
+                    style={{ display: 'flex', gap: '14px', justifyContent: 'center' }}
+                >
+                    <button
+                        onClick={() => navigate('/login')}
+                        style={{
+                            background: '#003366', color: '#FFFFFF', border: 'none',
+                            padding: '16px 36px', borderRadius: '10px',
+                            fontSize: '16px', fontWeight: '600', cursor: 'pointer',
+                            boxShadow: '0 4px 16px rgba(0,51,102,0.25)',
+                            transition: 'transform 0.3s ease, box-shadow 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-2px)';
+                            e.currentTarget.style.boxShadow = '0 8px 28px rgba(0,51,102,0.3)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,51,102,0.25)';
+                        }}
+                    >
+                        Sign Up Free →
+                    </button>
+                    <button
+                        onClick={() => navigate('/login')}
+                        style={{
+                            background: 'rgba(0,51,102,0.06)', color: '#003366',
+                            border: '1px solid rgba(0,51,102,0.12)',
+                            padding: '16px 36px', borderRadius: '10px',
+                            fontSize: '16px', fontWeight: '600', cursor: 'pointer',
+                            backdropFilter: 'blur(8px)',
+                            transition: 'transform 0.3s ease, background 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-2px)';
+                            e.currentTarget.style.background = 'rgba(0,51,102,0.10)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.background = 'rgba(0,51,102,0.06)';
+                        }}
+                    >
+                        Log In
+                    </button>
+                </motion.div>
+            </div>
+        </section>
+    );
+};
+
 /* ─── Combined editorial section (replaces old card animations) ─── */
 const FileDrawerSection = () => (
     <div style={{ background: '#FFFFFF' }}>
@@ -549,6 +678,7 @@ const FileDrawerSection = () => (
         {SECTIONS.map((section, i) => (
             <ScrollFeature key={i} section={section} reversed={i % 2 !== 0} />
         ))}
+        <CTASection />
     </div>
 );
 

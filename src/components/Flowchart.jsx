@@ -27,11 +27,9 @@ const Navbar = () => {
             backdropFilter: 'blur(20px)',
             borderBottom: '1px solid rgba(0,51,102,0.06)'
         }}>
-            <div
-                style={{ fontSize: '24px', fontWeight: '700', color: '#003366', cursor: 'pointer' }}
-                onClick={() => navigate('/')}
-            >
-                LEGOL
+            <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+                <img src="/legol-icon.png" alt="LEGOL" style={{ height: '28px' }} />
+                <span style={{ fontSize: '24px', fontWeight: '700', color: '#003366' }}>LEGOL</span>
             </div>
 
             <div style={{
@@ -520,7 +518,7 @@ const Flowchart = () => {
 
             {/* Page title */}
             <div style={{
-                position: 'fixed', top: '88px', left: '32px', zIndex: 40,
+                position: 'fixed', top: '104px', left: '32px', zIndex: 40,
                 display: 'flex', flexDirection: 'column', gap: '4px'
             }}>
                 <motion.h1

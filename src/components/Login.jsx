@@ -31,11 +31,9 @@ const Navbar = () => {
                 flexShrink: 0
             }}
         >
-            <div
-                style={{ fontSize: '24px', fontWeight: '700', color: '#003366', cursor: 'pointer' }}
-                onClick={() => navigate('/')}
-            >
-                LEGOL
+            <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+                <img src="/legol-icon.png" alt="LEGOL" style={{ height: '28px' }} />
+                <span style={{ fontSize: '24px', fontWeight: '700', color: '#003366' }}>LEGOL</span>
             </div>
 
             <div style={{
