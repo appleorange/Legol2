@@ -1,11 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Send, ChevronDown, ChevronUp } from 'lucide-react';
+import { Send, ChevronDown, ChevronUp, CheckCircle, AlertCircle } from 'lucide-react';
 import { api } from '../api';
 
+/* ─── Navbar ─── */
 const Navbar = ({ activePage = 'Chat' }) => {
     const navigate = useNavigate();
-
     const navItems = ['Home', 'Chat', 'Timeline', 'Resources'];
 
     return (
@@ -75,85 +75,268 @@ const Navbar = ({ activePage = 'Chat' }) => {
     );
 };
 
-const FilterDropdown = ({ label, value, options, isOpen, onToggle }) => {
-    return (
-        <div style={{ position: 'relative', flex: 1 }}>
-            <button
-                onClick={onToggle}
-                style={{
-                    width: '100%',
-                    padding: '18px 24px',
-                    borderRadius: '16px',
-                    border: 'none',
-                    background: 'rgba(255, 255, 255, 0.7)',
-                    backdropFilter: 'blur(12px)',
-                    boxShadow: '0 4px 20px rgba(0, 51, 102, 0.06), inset 0 1px 0 rgba(255,255,255,0.8)',
-                    fontSize: '15px',
-                    fontWeight: '500',
-                    color: '#003366',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    transition: 'all 0.2s ease',
-                    fontFamily: 'inherit'
-                }}
-            >
-                <span>
-                    {label}{value && ' : '}
-                    {value && <em style={{ fontStyle: 'italic', fontWeight: '600' }}>{value}</em>}
-                </span>
-                {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </button>
+/* ─── Filter Dropdown (bottom bar) ─── */
+const FilterDropdown = ({ label, value, options, isOpen, onToggle }) => (
+    <div style={{ position: 'relative', flex: 1 }}>
+        <button
+            onClick={onToggle}
+            style={{
+                width: '100%',
+                height: '100%',
+                minHeight: '60px',
+                padding: '18px 24px',
+                borderRadius: '16px',
+                border: 'none',
+                background: 'rgba(255, 255, 255, 0.7)',
+                backdropFilter: 'blur(12px)',
+                boxShadow: '0 4px 20px rgba(0, 51, 102, 0.06), inset 0 1px 0 rgba(255,255,255,0.8)',
+                fontSize: '15px',
+                fontWeight: '500',
+                color: '#003366',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                transition: 'all 0.2s ease',
+                fontFamily: 'inherit',
+                boxSizing: 'border-box'
+            }}
+        >
+            <span>
+                {label}{value && ' : '}
+                {value && <em style={{ fontStyle: 'italic', fontWeight: '600' }}>{value}</em>}
+            </span>
+            {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
 
-            {isOpen && options && (
-                <div style={{
-                    position: 'absolute',
-                    bottom: '110%',
-                    left: 0,
-                    right: 0,
-                    background: 'rgba(255, 255, 255, 0.85)',
-                    backdropFilter: 'blur(16px)',
-                    borderRadius: '16px',
-                    padding: '12px 0',
-                    boxShadow: '0 8px 32px rgba(0, 51, 102, 0.1), inset 0 1px 0 rgba(255,255,255,0.8)',
-                    zIndex: 30,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '2px'
-                }}>
-                    {options.map((option) => (
-                        <div
-                            key={option}
-                            style={{
-                                padding: '12px 24px',
-                                fontSize: '15px',
-                                fontWeight: '500',
-                                color: '#003366',
-                                cursor: 'pointer',
-                                textAlign: 'center',
-                                transition: 'background 0.15s ease'
-                            }}
-                            onMouseEnter={(e) => e.target.style.background = 'rgba(0, 51, 102, 0.05)'}
-                            onMouseLeave={(e) => e.target.style.background = 'transparent'}
-                        >
-                            {option}
-                        </div>
-                    ))}
+        {isOpen && options && (
+            <div style={{
+                position: 'absolute',
+                bottom: '110%',
+                left: 0,
+                right: 0,
+                background: 'rgba(255, 255, 255, 0.85)',
+                backdropFilter: 'blur(16px)',
+                borderRadius: '16px',
+                padding: '12px 0',
+                boxShadow: '0 8px 32px rgba(0, 51, 102, 0.1), inset 0 1px 0 rgba(255,255,255,0.8)',
+                zIndex: 30,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2px'
+            }}>
+                {options.map((option) => (
+                    <div
+                        key={option}
+                        style={{
+                            padding: '12px 24px',
+                            fontSize: '15px',
+                            fontWeight: '500',
+                            color: '#003366',
+                            cursor: 'pointer',
+                            textAlign: 'center',
+                            transition: 'background 0.15s ease'
+                        }}
+                        onMouseEnter={(e) => e.target.style.background = 'rgba(0, 51, 102, 0.05)'}
+                        onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                    >
+                        {option}
+                    </div>
+                ))}
+            </div>
+        )}
+    </div>
+);
+
+/* ─── Sample documents data ─── */
+const DOCUMENTS = [
+    {
+        id: 'birth-cert',
+        title: 'Birth Certificate (Original)',
+        source: 'Vital Records Office',
+        due: 'Feb 1, 2026',
+        description: 'Original or certified copy of birth certificate',
+        status: 'VERIFIED',
+        category: 'Identity'
+    },
+    {
+        id: 'passport',
+        title: 'Passport Copy',
+        source: 'Department of State',
+        due: null,
+        description: 'Valid passport identification page copy',
+        status: 'VERIFIED',
+        category: 'Identity'
+    },
+    {
+        id: 'n400',
+        title: 'Form N-400 (Naturalization Application)',
+        source: 'USCIS',
+        due: 'Feb 7, 2026',
+        description: 'Application for naturalization form',
+        status: 'UPLOADED',
+        category: 'Applications'
+    },
+    {
+        id: 'tax-returns',
+        title: 'Tax Returns (Last 5 Years)',
+        source: 'IRS',
+        due: 'Feb 14, 2026',
+        description: 'Federal tax return transcripts for the last 5 years',
+        status: 'UPLOADED',
+        category: 'Financial'
+    },
+    {
+        id: 'employment-letter',
+        title: 'Employment Verification Letter',
+        source: 'Current Employer',
+        due: 'Feb 10, 2026',
+        description: 'Letter confirming current employment status',
+        status: 'UPLOADED',
+        category: 'Work'
+    },
+    {
+        id: 'marriage-cert',
+        title: 'Marriage Certificate',
+        source: 'County Clerk',
+        due: null,
+        description: 'Certified copy of marriage certificate',
+        status: 'VERIFIED',
+        category: 'Family'
+    },
+    {
+        id: 'background-check',
+        title: 'FBI Background Check',
+        source: 'FBI',
+        due: 'Mar 1, 2026',
+        description: 'Criminal background check clearance',
+        status: 'UPLOADED',
+        category: 'Background'
+    },
+    {
+        id: 'lease-agreement',
+        title: 'Lease Agreement',
+        source: 'Landlord / Property Management',
+        due: null,
+        description: 'Current residential lease or mortgage statement',
+        status: 'VERIFIED',
+        category: 'Residence'
+    }
+];
+
+const DOC_CATEGORIES = ['All Documents', 'Identity', 'Applications', 'Financial', 'Work', 'Family', 'Background', 'Residence'];
+
+/* ─── Document Card (draggable) ─── */
+const DocumentCard = ({ doc }) => {
+    const isVerified = doc.status === 'VERIFIED';
+
+    const handleDragStart = (e) => {
+        e.dataTransfer.setData('text/plain', `[Document: ${doc.title}]`);
+        e.dataTransfer.setData('application/json', JSON.stringify(doc));
+        e.dataTransfer.effectAllowed = 'copy';
+    };
+
+    return (
+        <div
+            draggable
+            onDragStart={handleDragStart}
+            style={{
+                background: 'rgba(255, 255, 255, 0.75)',
+                backdropFilter: 'blur(8px)',
+                borderRadius: '16px',
+                padding: '20px 24px',
+                cursor: 'grab',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 2px 8px rgba(0, 51, 102, 0.04)',
+                borderLeft: `3px solid ${isVerified ? '#28a745' : '#2563eb'}`,
+            }}
+            onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 51, 102, 0.1)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 51, 102, 0.04)';
+                e.currentTarget.style.transform = 'translateY(0)';
+            }}
+        >
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+                {/* Status Icon */}
+                <div style={{ paddingTop: '2px', flexShrink: 0 }}>
+                    {isVerified
+                        ? <CheckCircle size={22} color="#28a745" />
+                        : <AlertCircle size={22} color="#2563eb" />
+                    }
                 </div>
-            )}
+
+                {/* Content */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+                        <h4 style={{
+                            margin: 0,
+                            fontSize: '15px',
+                            fontWeight: '600',
+                            color: '#1E272D',
+                            lineHeight: '1.35'
+                        }}>
+                            {doc.title}
+                        </h4>
+                        <span style={{
+                            fontSize: '11px',
+                            fontWeight: '700',
+                            color: isVerified ? '#155724' : '#004085',
+                            letterSpacing: '0.3px',
+                            flexShrink: 0,
+                            paddingTop: '2px'
+                        }}>
+                            {doc.status}
+                        </span>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '4px' }}>
+                        <span style={{ fontSize: '13px', color: '#8896a6' }}>{doc.source}</span>
+                        {doc.due && (
+                            <>
+                                <span style={{ fontSize: '13px', color: '#8896a6' }}>·</span>
+                                <span style={{ fontSize: '13px', color: '#dc3545', fontWeight: '500' }}>Due: {doc.due}</span>
+                            </>
+                        )}
+                    </div>
+
+                    <p style={{
+                        margin: '6px 0 0',
+                        fontSize: '13px',
+                        color: '#8896a6',
+                        lineHeight: '1.45'
+                    }}>
+                        {doc.description}
+                    </p>
+                </div>
+            </div>
         </div>
     );
 };
 
+/* ─── Main Chat Page ─── */
 const Chat = () => {
     const [query, setQuery] = useState('');
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState([
+        {
+            role: 'assistant',
+            text: "Hello! I\u2019m your LEGOL immigration assistant. I can help answer questions about dual citizenship, work visas, document requirements, and more. How can I assist you today?"
+        }
+    ]);
     const [isLoading, setIsLoading] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(null);
+    const [activeCategory, setActiveCategory] = useState('All Documents');
+    const [isDragOver, setIsDragOver] = useState(false);
     const inputRef = useRef(null);
 
+    const filteredDocs = activeCategory === 'All Documents'
+        ? DOCUMENTS
+        : DOCUMENTS.filter(d => d.category === activeCategory);
+
+    /* ── Send message ── */
     const handleSend = async () => {
         if (!query.trim() || isLoading) return;
 
@@ -185,9 +368,40 @@ const Chat = () => {
         setOpenDropdown(prev => prev === name ? null : name);
     };
 
+    /* ── Drag-and-drop handlers for the input area ── */
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+        setIsDragOver(true);
+    };
+
+    const handleDragLeave = () => setIsDragOver(false);
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        setIsDragOver(false);
+
+        const jsonData = e.dataTransfer.getData('application/json');
+        if (jsonData) {
+            try {
+                const doc = JSON.parse(jsonData);
+                const mention = `[📄 ${doc.title}] `;
+                setQuery(prev => prev + mention);
+                inputRef.current?.focus();
+            } catch { /* ignore bad data */ }
+            return;
+        }
+
+        const text = e.dataTransfer.getData('text/plain');
+        if (text) {
+            setQuery(prev => prev + text);
+            inputRef.current?.focus();
+        }
+    };
+
     return (
         <div style={{
-            minHeight: '100vh',
+            height: '100vh',
             background: '#EEF2F7',
             position: 'relative',
             overflow: 'hidden',
@@ -227,145 +441,227 @@ const Chat = () => {
 
             <Navbar activePage="Chat" />
 
-            {/* Main Chat Area */}
+            {/* ─── Two-Column Layout ─── */}
             <div style={{
                 flex: 1,
                 display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-end',
+                gap: '24px',
                 position: 'relative',
                 zIndex: 10,
-                paddingTop: '120px',
-                paddingBottom: '40px',
-                maxWidth: '1200px',
+                paddingTop: '110px',
+                paddingBottom: '32px',
+                paddingLeft: '48px',
+                paddingRight: '48px',
+                maxWidth: '1440px',
                 width: '100%',
                 margin: '0 auto',
-                paddingLeft: '40px',
-                paddingRight: '40px',
-                boxSizing: 'border-box'
+                boxSizing: 'border-box',
+                overflow: 'hidden'
             }}>
-                {/* Messages Area */}
+
+                {/* ─── LEFT: Chat Column ─── */}
                 <div style={{
-                    flex: 1,
-                    overflowY: 'auto',
+                    flex: '1 1 55%',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '16px',
-                    paddingBottom: '24px'
+                    minWidth: 0,
+                    overflow: 'hidden'
                 }}>
-                    {messages.map((msg, i) => (
-                        <div
-                            key={i}
-                            style={{
-                                alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                                maxWidth: '70%',
-                                padding: '16px 20px',
-                                borderRadius: msg.role === 'user' ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
-                                background: msg.role === 'user'
-                                    ? 'rgba(0, 51, 102, 0.85)'
-                                    : 'rgba(255, 255, 255, 0.8)',
-                                color: msg.role === 'user' ? '#FFFFFF' : '#003366',
+                    {/* Messages */}
+                    <div style={{
+                        flex: 1,
+                        overflowY: 'auto',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '16px',
+                        paddingBottom: '20px',
+                        paddingRight: '8px'
+                    }}>
+                        {messages.map((msg, i) => (
+                            <div
+                                key={i}
+                                style={{
+                                    alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                                    maxWidth: '80%',
+                                    padding: '18px 22px',
+                                    borderRadius: msg.role === 'user' ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
+                                    background: msg.role === 'user'
+                                        ? 'rgba(0, 51, 102, 0.85)'
+                                        : 'rgba(255, 255, 255, 0.8)',
+                                    color: msg.role === 'user' ? '#FFFFFF' : '#003366',
+                                    fontSize: '15px',
+                                    lineHeight: '1.65',
+                                    backdropFilter: 'blur(10px)',
+                                    boxShadow: '0 4px 12px rgba(0, 51, 102, 0.08)'
+                                }}
+                            >
+                                {msg.text}
+                            </div>
+                        ))}
+                        {isLoading && (
+                            <div style={{
+                                alignSelf: 'flex-start',
+                                padding: '18px 22px',
+                                borderRadius: '20px 20px 20px 4px',
+                                background: 'rgba(255, 255, 255, 0.8)',
+                                color: '#64748b',
                                 fontSize: '15px',
-                                lineHeight: '1.6',
                                 backdropFilter: 'blur(10px)',
                                 boxShadow: '0 4px 12px rgba(0, 51, 102, 0.08)'
-                            }}
-                        >
-                            {msg.text}
-                        </div>
-                    ))}
-                    {isLoading && (
-                        <div style={{
-                            alignSelf: 'flex-start',
-                            padding: '16px 20px',
-                            borderRadius: '20px 20px 20px 4px',
-                            background: 'rgba(255, 255, 255, 0.8)',
-                            color: '#64748b',
-                            fontSize: '15px',
-                            backdropFilter: 'blur(10px)',
-                            boxShadow: '0 4px 12px rgba(0, 51, 102, 0.08)'
-                        }}>
-                            Thinking...
-                        </div>
-                    )}
-                </div>
+                            }}>
+                                Thinking...
+                            </div>
+                        )}
+                    </div>
 
-                {/* Filter Dropdowns Row */}
-                <div style={{
-                    display: 'flex',
-                    gap: '16px',
-                    marginBottom: '16px'
-                }}>
-                    <FilterDropdown
-                        label="International Student"
-                        value="Singapore"
-                        isOpen={openDropdown === 'student'}
-                        onToggle={() => toggleDropdown('student')}
-                        options={['Singapore', 'India', 'China', 'South Korea', 'Japan', 'Other...']}
-                    />
-                    <FilterDropdown
-                        label="Institution"
-                        value="Carnegie Mellon University"
-                        isOpen={openDropdown === 'institution'}
-                        onToggle={() => toggleDropdown('institution')}
-                        options={['Carnegie Mellon University', 'MIT', 'Stanford', 'Harvard', 'Other...']}
-                    />
-                    <FilterDropdown
-                        label="Topic"
-                        value={null}
-                        isOpen={openDropdown === 'topic'}
-                        onToggle={() => toggleDropdown('topic')}
-                        options={['Work Visa', 'Financial Support', 'Immigration', 'Other...']}
-                    />
-                </div>
+                    {/* Filter Dropdowns */}
+                    <div style={{ display: 'flex', gap: '12px', marginBottom: '12px', alignItems: 'stretch' }}>
+                        <FilterDropdown
+                            label="International Student"
+                            value="Singapore"
+                            isOpen={openDropdown === 'student'}
+                            onToggle={() => toggleDropdown('student')}
+                            options={['Singapore', 'India', 'China', 'South Korea', 'Japan', 'Other...']}
+                        />
+                        <FilterDropdown
+                            label="Institution"
+                            value="Carnegie Mellon University"
+                            isOpen={openDropdown === 'institution'}
+                            onToggle={() => toggleDropdown('institution')}
+                            options={['Carnegie Mellon University', 'MIT', 'Stanford', 'Harvard', 'Other...']}
+                        />
+                        <FilterDropdown
+                            label="Topic"
+                            value={null}
+                            isOpen={openDropdown === 'topic'}
+                            onToggle={() => toggleDropdown('topic')}
+                            options={['Work Visa', 'Financial Support', 'Immigration', 'Other...']}
+                        />
+                    </div>
 
-                {/* Input Bar */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    background: 'rgba(255, 255, 255, 0.7)',
-                    backdropFilter: 'blur(12px)',
-                    borderRadius: '16px',
-                    padding: '6px 8px 6px 24px',
-                    boxShadow: '0 4px 20px rgba(0, 51, 102, 0.06), inset 0 1px 0 rgba(255,255,255,0.8)',
-                }}>
-                    <input
-                        ref={inputRef}
-                        type="text"
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        placeholder="Ask anything..."
+                    {/* Input Bar (drop target) */}
+                    <div
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
                         style={{
-                            flex: 1,
-                            border: 'none',
-                            outline: 'none',
-                            background: 'transparent',
-                            fontSize: '15px',
-                            color: '#003366',
-                            fontFamily: 'inherit',
-                            padding: '12px 0'
-                        }}
-                    />
-                    <button
-                        onClick={handleSend}
-                        disabled={isLoading || !query.trim()}
-                        style={{
-                            width: '44px',
-                            height: '44px',
-                            borderRadius: '12px',
-                            border: 'none',
-                            background: 'transparent',
-                            cursor: query.trim() ? 'pointer' : 'default',
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
-                            transition: 'all 0.2s ease',
-                            opacity: query.trim() ? 0.8 : 0.35
+                            background: isDragOver ? 'rgba(0, 51, 102, 0.06)' : 'rgba(255, 255, 255, 0.7)',
+                            backdropFilter: 'blur(12px)',
+                            borderRadius: '16px',
+                            padding: '6px 8px 6px 24px',
+                            boxShadow: isDragOver
+                                ? '0 0 0 2px rgba(0, 51, 102, 0.25), 0 4px 20px rgba(0, 51, 102, 0.1)'
+                                : '0 4px 20px rgba(0, 51, 102, 0.06), inset 0 1px 0 rgba(255,255,255,0.8)',
+                            transition: 'all 0.2s ease'
                         }}
                     >
-                        <Send size={20} color="#003366" />
-                    </button>
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            placeholder={isDragOver ? 'Drop document here...' : 'Ask anything...'}
+                            style={{
+                                flex: 1,
+                                border: 'none',
+                                outline: 'none',
+                                background: 'transparent',
+                                fontSize: '15px',
+                                color: '#003366',
+                                fontFamily: 'inherit',
+                                padding: '12px 0'
+                            }}
+                        />
+                        <button
+                            onClick={handleSend}
+                            disabled={isLoading || !query.trim()}
+                            style={{
+                                width: '44px',
+                                height: '44px',
+                                borderRadius: '12px',
+                                border: 'none',
+                                background: 'transparent',
+                                cursor: query.trim() ? 'pointer' : 'default',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'all 0.2s ease',
+                                opacity: query.trim() ? 0.8 : 0.35
+                            }}
+                        >
+                            <Send size={20} color="#003366" />
+                        </button>
+                    </div>
+                </div>
+
+                {/* ─── RIGHT: Documents Panel ─── */}
+                <div style={{
+                    flex: '0 0 400px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    overflow: 'hidden',
+                    gap: '16px'
+                }}>
+                    {/* Category Chips */}
+                    <div style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: '8px'
+                    }}>
+                        {DOC_CATEGORIES.map((cat) => (
+                            <button
+                                key={cat}
+                                onClick={() => setActiveCategory(cat)}
+                                style={{
+                                    padding: '10px 20px',
+                                    borderRadius: '12px',
+                                    border: 'none',
+                                    background: activeCategory === cat ? '#003366' : 'rgba(255,255,255,0.75)',
+                                    color: activeCategory === cat ? '#FFFFFF' : '#64748b',
+                                    fontSize: '13px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    backdropFilter: 'blur(8px)',
+                                    boxShadow: activeCategory === cat
+                                        ? '0 4px 12px rgba(0, 51, 102, 0.2)'
+                                        : '0 2px 6px rgba(0, 51, 102, 0.04)',
+                                    transition: 'all 0.2s ease',
+                                    fontFamily: 'inherit'
+                                }}
+                            >
+                                {cat}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Document Cards (scrollable) */}
+                    <div style={{
+                        flex: 1,
+                        overflowY: 'auto',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '12px',
+                        paddingRight: '4px',
+                        paddingBottom: '8px'
+                    }}>
+                        {filteredDocs.map((doc) => (
+                            <DocumentCard key={doc.id} doc={doc} />
+                        ))}
+
+                        {filteredDocs.length === 0 && (
+                            <div style={{
+                                padding: '40px 20px',
+                                textAlign: 'center',
+                                color: '#94a3b8',
+                                fontSize: '14px'
+                            }}>
+                                No documents in this category.
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
@@ -373,4 +669,3 @@ const Chat = () => {
 };
 
 export default Chat;
-
