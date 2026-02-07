@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { MessageSquare, Calendar, FileText, Landmark } from 'lucide-react';
@@ -244,7 +244,7 @@ const FeatureCard = ({ icon: Icon, title, subtitle, route, index }) => {
     );
 };
 
-/* ─── Scroll indicator ─── */
+/* ─── Scroll indicator (subtle bouncing arrow) ─── */
 const ScrollIndicator = () => (
     <motion.div
         initial={{ opacity: 0 }}
@@ -252,35 +252,304 @@ const ScrollIndicator = () => (
         transition={{ delay: 2.2, duration: 0.8 }}
         style={{
             position: 'absolute',
-            bottom: '40px',
+            bottom: '36px',
             left: '50%',
             transform: 'translateX(-50%)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '8px',
-            zIndex: 10
+            zIndex: 10,
+            cursor: 'pointer'
         }}
+        onClick={() => window.scrollBy({ top: 400, behavior: 'smooth' })}
     >
-        <span style={{
-            fontSize: '11px',
-            letterSpacing: '3px',
-            textTransform: 'uppercase',
-            color: 'rgba(0, 51, 102, 0.35)',
-            fontWeight: '500'
-        }}>
-            Scroll to explore
-        </span>
         <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            style={{
-                width: '1px',
-                height: '32px',
-                background: 'linear-gradient(to bottom, rgba(0,51,102,0.3), transparent)'
-            }}
-        />
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+        >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(0,51,102,0.3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="6 9 12 15 18 9" />
+            </svg>
+        </motion.div>
     </motion.div>
+);
+
+/* ─── EDITORIAL SCROLL SECTIONS (fouroom-style typography + image parallax) ─── */
+
+const SECTIONS = [
+    {
+        tag: '01',
+        headline: ['Navigate your', 'immigration journey', 'with clarity.'],
+        body: 'One unified platform for every visa application, document, and deadline. AI-powered guidance that actually understands immigration law.',
+        gradient: 'linear-gradient(135deg, #001a33 0%, #003366 40%, #1a4d80 100%)',
+        mockup: 'chat',
+    },
+    {
+        tag: '02',
+        headline: ['Every document.', 'Tracked, verified,', 'and organized.'],
+        body: 'Upload once, access everywhere. Intelligent categorization, deadline alerts, and automated verification — your paperwork, handled.',
+        gradient: 'linear-gradient(135deg, #003366 0%, #1a4d80 50%, #336699 100%)',
+        mockup: 'docs',
+    },
+    {
+        tag: '03',
+        headline: ['Your timeline.', 'Every milestone,', 'mapped.'],
+        body: 'From filing dates to biometrics appointments to final decisions — see your entire journey laid out with real-time status updates.',
+        gradient: 'linear-gradient(135deg, #002244 0%, #003366 60%, #4d7faa 100%)',
+        mockup: 'timeline',
+    },
+];
+
+/* ─── Product Mockup (visual placeholder inside the image block) ─── */
+const Mockup = ({ type, gradient }) => (
+    <div style={{
+        width: '100%',
+        height: '100%',
+        background: gradient,
+        position: 'relative',
+        overflow: 'hidden',
+        padding: '40px'
+    }}>
+        {/* Glow orb */}
+        <div style={{
+            position: 'absolute', top: '-20%', right: '-10%',
+            width: '60%', height: '60%', borderRadius: '50%',
+            background: 'rgba(255,255,255,0.06)', filter: 'blur(60px)'
+        }} />
+
+        {type === 'chat' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '20px' }}>
+                {/* Chat bubbles */}
+                <div style={{ alignSelf: 'flex-start', background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)', borderRadius: '16px 16px 16px 4px', padding: '16px 22px', maxWidth: '75%' }}>
+                    <div style={{ height: '8px', width: '180px', borderRadius: '100px', background: 'rgba(255,255,255,0.3)', marginBottom: '8px' }} />
+                    <div style={{ height: '6px', width: '120px', borderRadius: '100px', background: 'rgba(255,255,255,0.15)' }} />
+                </div>
+                <div style={{ alignSelf: 'flex-end', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(8px)', borderRadius: '16px 16px 4px 16px', padding: '16px 22px', maxWidth: '65%' }}>
+                    <div style={{ height: '8px', width: '140px', borderRadius: '100px', background: 'rgba(255,255,255,0.4)', marginBottom: '8px' }} />
+                    <div style={{ height: '6px', width: '200px', borderRadius: '100px', background: 'rgba(255,255,255,0.2)', marginBottom: '8px' }} />
+                    <div style={{ height: '6px', width: '100px', borderRadius: '100px', background: 'rgba(255,255,255,0.15)' }} />
+                </div>
+                <div style={{ alignSelf: 'flex-start', background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)', borderRadius: '16px 16px 16px 4px', padding: '16px 22px', maxWidth: '70%' }}>
+                    <div style={{ height: '8px', width: '160px', borderRadius: '100px', background: 'rgba(255,255,255,0.3)', marginBottom: '8px' }} />
+                    <div style={{ height: '6px', width: '90px', borderRadius: '100px', background: 'rgba(255,255,255,0.15)' }} />
+                </div>
+            </div>
+        )}
+
+        {type === 'docs' && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginTop: '10px' }}>
+                {[1, 2, 3, 4].map(i => (
+                    <div key={i} style={{
+                        background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(8px)',
+                        borderRadius: '14px', padding: '20px', border: '1px solid rgba(255,255,255,0.08)'
+                    }}>
+                        <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,255,255,0.15)', marginBottom: '14px' }} />
+                        <div style={{ height: '7px', width: '80%', borderRadius: '100px', background: 'rgba(255,255,255,0.25)', marginBottom: '8px' }} />
+                        <div style={{ height: '5px', width: '55%', borderRadius: '100px', background: 'rgba(255,255,255,0.12)' }} />
+                    </div>
+                ))}
+            </div>
+        )}
+
+        {type === 'timeline' && (
+            <div style={{ display: 'flex', gap: '24px', marginTop: '20px', paddingLeft: '20px' }}>
+                {/* Vertical line */}
+                <div style={{ width: '2px', background: 'rgba(255,255,255,0.15)', borderRadius: '100px', position: 'relative', minHeight: '260px' }}>
+                    {[0, 0.25, 0.5, 0.75, 1].map((p, i) => (
+                        <div key={i} style={{
+                            position: 'absolute', left: '-5px', top: `${p * 100}%`,
+                            width: '12px', height: '12px', borderRadius: '50%',
+                            background: i < 3 ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.12)',
+                            border: '2px solid rgba(255,255,255,0.2)'
+                        }} />
+                    ))}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', flex: 1 }}>
+                    {['Filed', 'Biometrics', 'Interview', 'Decision', 'Approved'].map((step, i) => (
+                        <div key={i} style={{ opacity: i < 3 ? 1 : 0.4 }}>
+                            <div style={{ height: '7px', width: `${60 + i * 8}%`, borderRadius: '100px', background: 'rgba(255,255,255,0.25)', marginBottom: '6px' }} />
+                            <div style={{ height: '5px', width: '40%', borderRadius: '100px', background: 'rgba(255,255,255,0.1)' }} />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        )}
+    </div>
+);
+
+/* ─── Single Feature Section (text + image, alternating layout) ─── */
+const ScrollFeature = ({ section, reversed }) => {
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, amount: 0.25 });
+
+    const { scrollYProgress } = useScroll({
+        target: ref,
+        offset: ['start end', 'end start']
+    });
+
+    /* Image parallax + scale */
+    const imgY = useTransform(scrollYProgress, [0, 1], [80, -80]);
+    const imgScale = useTransform(scrollYProgress, [0, 0.4, 0.6], [0.92, 1, 1]);
+
+    return (
+        <section ref={ref} style={{
+            padding: '140px 64px',
+            maxWidth: '1400px',
+            margin: '0 auto',
+            display: 'flex',
+            flexDirection: reversed ? 'row-reverse' : 'row',
+            alignItems: 'center',
+            gap: '80px'
+        }}>
+            {/* ─── Text side ─── */}
+            <div style={{ flex: '1 1 45%' }}>
+                {/* Tag number */}
+                <motion.span
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={isInView ? { opacity: 1, x: 0 } : {}}
+                    transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                    style={{
+                        fontSize: '13px', fontWeight: '600', letterSpacing: '3px',
+                        textTransform: 'uppercase', color: 'rgba(0,51,102,0.3)',
+                        display: 'block', marginBottom: '28px'
+                    }}
+                >
+                    {section.tag}
+                </motion.span>
+
+                {/* Headline — line-by-line reveal */}
+                <div style={{ marginBottom: '28px' }}>
+                    {section.headline.map((line, i) => (
+                        <div key={i} style={{ overflow: 'hidden' }}>
+                            <motion.div
+                                initial={{ y: '110%' }}
+                                animate={isInView ? { y: 0 } : {}}
+                                transition={{
+                                    duration: 0.9,
+                                    delay: 0.15 + i * 0.1,
+                                    ease: [0.22, 1, 0.36, 1]
+                                }}
+                            >
+                                <span style={{
+                                    fontSize: '52px',
+                                    fontWeight: '500',
+                                    color: '#003366',
+                                    lineHeight: '1.15',
+                                    letterSpacing: '-1.5px',
+                                    display: 'block'
+                                }}>
+                                    {line}
+                                </span>
+                            </motion.div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Body text */}
+                <motion.p
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.7, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                    style={{
+                        fontSize: '17px', color: '#64748b', lineHeight: '1.8',
+                        maxWidth: '420px', margin: 0
+                    }}
+                >
+                    {section.body}
+                </motion.p>
+            </div>
+
+            {/* ─── Image side (parallax + scale) ─── */}
+            <motion.div
+                style={{
+                    flex: '1 1 50%',
+                    y: imgY,
+                    scale: imgScale
+                }}
+            >
+                <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                    style={{
+                        width: '100%',
+                        aspectRatio: '4 / 3',
+                        borderRadius: '20px',
+                        overflow: 'hidden',
+                        boxShadow: '0 24px 80px rgba(0, 51, 102, 0.12), 0 4px 12px rgba(0,51,102,0.04)'
+                    }}
+                >
+                    <Mockup type={section.mockup} gradient={section.gradient} />
+                </motion.div>
+            </motion.div>
+        </section>
+    );
+};
+
+/* ─── Full-width statement (big typography reveal) ─── */
+const StatementSection = () => {
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, amount: 0.4 });
+
+    const words = ['AI-powered.', 'Document-ready.', 'Deadline-proof.'];
+
+    return (
+        <section ref={ref} style={{
+            padding: '180px 64px',
+            maxWidth: '1400px',
+            margin: '0 auto',
+            textAlign: 'center'
+        }}>
+            <div style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                gap: '16px 24px'
+            }}>
+                {words.map((word, i) => (
+                    <div key={i} style={{ overflow: 'hidden' }}>
+                        <motion.span
+                            initial={{ y: '110%' }}
+                            animate={isInView ? { y: 0 } : {}}
+                            transition={{
+                                duration: 1,
+                                delay: i * 0.15,
+                                ease: [0.22, 1, 0.36, 1]
+                            }}
+                            style={{
+                                fontSize: '76px',
+                                fontWeight: '500',
+                                color: '#003366',
+                                letterSpacing: '-2px',
+                                display: 'block',
+                                lineHeight: '1.1'
+                            }}
+                        >
+                            {word}
+                        </motion.span>
+                    </div>
+                ))}
+            </div>
+            <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.7, delay: 0.5 }}
+                style={{
+                    fontSize: '17px', color: '#94a3b8', lineHeight: '1.7',
+                    maxWidth: '500px', margin: '40px auto 0', textAlign: 'center'
+                }}
+            >
+                Built for international students navigating one of the most complex systems in the world.
+            </motion.p>
+        </section>
+    );
+};
+
+/* ─── Combined editorial section (replaces old card animations) ─── */
+const FileDrawerSection = () => (
+    <div style={{ background: '#FFFFFF' }}>
+        <StatementSection />
+        {SECTIONS.map((section, i) => (
+            <ScrollFeature key={i} section={section} reversed={i % 2 !== 0} />
+        ))}
+    </div>
 );
 
 /* ─── MAIN HERO ─── */
@@ -351,14 +620,14 @@ const Hero = () => {
             <div style={{
                 position: 'relative',
                 zIndex: 10,
-                paddingTop: '200px',
+                paddingTop: '160px',
                 paddingLeft: '64px',
                 paddingRight: '64px',
                 maxWidth: '1440px',
                 margin: '0 auto'
             }}>
                 {/* ─── Hero Text with letter-by-letter animation ─── */}
-                <motion.div style={{ y, opacity, marginBottom: '60px' }}>
+                <motion.div style={{ y, opacity, marginBottom: '44px' }}>
                     <div style={{
                         fontSize: '96px',
                         fontWeight: '400',
@@ -419,7 +688,7 @@ const Hero = () => {
                 </motion.div>
 
                 {/* ─── Marquee Strips (exat-style) ─── */}
-                <motion.div style={{ opacity: marqueeOpacity, marginBottom: '80px' }}>
+                <motion.div style={{ opacity: marqueeOpacity, marginBottom: '56px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         <Marquee items={MARQUEE_ITEMS_1} speed={35} />
                         <Marquee items={MARQUEE_ITEMS_2} speed={40} reverse />
@@ -470,4 +739,12 @@ const Hero = () => {
     );
 };
 
-export default Hero;
+/* ─── Combined Page Export ─── */
+const HomePage = () => (
+    <>
+        <Hero />
+        <FileDrawerSection />
+    </>
+);
+
+export default HomePage;

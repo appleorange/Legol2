@@ -447,12 +447,15 @@ const Chat = () => {
     const [openDropdown, setOpenDropdown] = useState(null);
     const [activeCategory, setActiveCategory] = useState('All Documents');
     const [isDragOver, setIsDragOver] = useState(false);
+    const [isChatDragOver, setIsChatDragOver] = useState(false);
     const [uploadedFiles, setUploadedFiles] = useState([]);
     const [studentCountry, setStudentCountry] = useState('Singapore');
     const [institution, setInstitution] = useState('Carnegie Mellon University');
     const [topic, setTopic] = useState(null);
     const inputRef = useRef(null);
     const fileInputRef = useRef(null);
+    const chatColumnRef = useRef(null);
+    const dragCounterRef = useRef(0);
 
     const filteredDocs = activeCategory === 'All Documents'
         ? DOCUMENTS
@@ -548,6 +551,51 @@ const Chat = () => {
         setUploadedFiles(prev => prev.filter((_, i) => i !== index));
     };
 
+    /* ── Drag-and-drop handlers for the full chat column ── */
+    const handleChatDragEnter = (e) => {
+        e.preventDefault();
+        dragCounterRef.current++;
+        setIsChatDragOver(true);
+    };
+
+    const handleChatDragOver = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+    };
+
+    const handleChatDragLeave = (e) => {
+        e.preventDefault();
+        dragCounterRef.current--;
+        if (dragCounterRef.current <= 0) {
+            dragCounterRef.current = 0;
+            setIsChatDragOver(false);
+        }
+    };
+
+    const handleChatDrop = (e) => {
+        e.preventDefault();
+        dragCounterRef.current = 0;
+        setIsChatDragOver(false);
+        setIsDragOver(false);
+
+        const jsonData = e.dataTransfer.getData('application/json');
+        if (jsonData) {
+            try {
+                const doc = JSON.parse(jsonData);
+                const mention = `[📄 ${doc.title}] `;
+                setQuery(prev => prev + mention);
+                inputRef.current?.focus();
+            } catch { /* ignore bad data */ }
+            return;
+        }
+
+        const text = e.dataTransfer.getData('text/plain');
+        if (text) {
+            setQuery(prev => prev + text);
+            inputRef.current?.focus();
+        }
+    };
+
     /* ── Drag-and-drop handlers for the input area ── */
     const handleDragOver = (e) => {
         e.preventDefault();
@@ -559,7 +607,10 @@ const Chat = () => {
 
     const handleDrop = (e) => {
         e.preventDefault();
+        e.stopPropagation();
         setIsDragOver(false);
+        dragCounterRef.current = 0;
+        setIsChatDragOver(false);
 
         const jsonData = e.dataTransfer.getData('application/json');
         if (jsonData) {
@@ -639,14 +690,78 @@ const Chat = () => {
                 overflow: 'hidden'
             }}>
 
-                {/* ─── LEFT: Chat Column ─── */}
-                <div style={{
-                    flex: '1 1 55%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    minWidth: 0,
-                    overflow: 'hidden'
-                }}>
+                {/* ─── LEFT: Chat Column (full drop zone) ─── */}
+                <div
+                    ref={chatColumnRef}
+                    onDragEnter={handleChatDragEnter}
+                    onDragOver={handleChatDragOver}
+                    onDragLeave={handleChatDragLeave}
+                    onDrop={handleChatDrop}
+                    style={{
+                        flex: '1 1 55%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        minWidth: 0,
+                        overflow: 'hidden',
+                        position: 'relative',
+                        borderRadius: '24px',
+                        transition: 'all 0.3s ease'
+                    }}
+                >
+                    {/* ─── Drag Overlay ─── */}
+                    {isChatDragOver && (
+                        <div style={{
+                            position: 'absolute',
+                            inset: 0,
+                            zIndex: 50,
+                            borderRadius: '24px',
+                            border: '2px dashed rgba(0, 51, 102, 0.35)',
+                            background: 'rgba(0, 51, 102, 0.04)',
+                            backdropFilter: 'blur(4px)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '12px',
+                            pointerEvents: 'none',
+                            animation: 'fadeIn 0.2s ease'
+                        }}>
+                            <div style={{
+                                width: '64px',
+                                height: '64px',
+                                borderRadius: '20px',
+                                background: 'rgba(0, 51, 102, 0.08)',
+                                backdropFilter: 'blur(12px)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: '0 4px 16px rgba(0, 51, 102, 0.1), inset 0 1px 0 rgba(255,255,255,0.6)'
+                            }}>
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#003366" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                    <line x1="12" y1="18" x2="12" y2="12" />
+                                    <polyline points="9 15 12 12 15 15" />
+                                </svg>
+                            </div>
+                            <span style={{
+                                fontSize: '15px',
+                                fontWeight: '600',
+                                color: '#003366',
+                                letterSpacing: '-0.01em'
+                            }}>
+                                Drop document into chat
+                            </span>
+                            <span style={{
+                                fontSize: '13px',
+                                color: '#64748b',
+                                fontWeight: '400'
+                            }}>
+                                It will be added to your message
+                            </span>
+                        </div>
+                    )}
+
                     {/* Messages */}
                     <div style={{
                         flex: 1,
