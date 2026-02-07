@@ -77,78 +77,164 @@ const Navbar = ({ activePage = 'Chat' }) => {
 };
 
 /* ─── Filter Dropdown (bottom bar) ─── */
-const FilterDropdown = ({ label, value, options, isOpen, onToggle }) => (
-    <div style={{ position: 'relative', flex: 1 }}>
-        <button
-            onClick={onToggle}
-            style={{
-                width: '100%',
-                height: '100%',
-                minHeight: '60px',
-                padding: '18px 24px',
-                borderRadius: '16px',
-                border: 'none',
-                background: 'rgba(255, 255, 255, 0.7)',
-                backdropFilter: 'blur(12px)',
-                boxShadow: '0 4px 20px rgba(0, 51, 102, 0.06), inset 0 1px 0 rgba(255,255,255,0.8)',
-                fontSize: '15px',
-                fontWeight: '500',
-                color: '#003366',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                transition: 'all 0.2s ease',
-                fontFamily: 'inherit',
-                boxSizing: 'border-box'
-            }}
-        >
-            <span>
-                {label}{value && ' : '}
-                {value && <em style={{ fontStyle: 'italic', fontWeight: '600' }}>{value}</em>}
-            </span>
-            {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-        </button>
+const FilterDropdown = ({ label, value, options, isOpen, onToggle, onChange }) => {
+    const [showCustomInput, setShowCustomInput] = useState(false);
+    const [customValue, setCustomValue] = useState('');
 
-        {isOpen && options && (
-            <div style={{
-                position: 'absolute',
-                bottom: '110%',
-                left: 0,
-                right: 0,
-                background: 'rgba(255, 255, 255, 0.85)',
-                backdropFilter: 'blur(16px)',
-                borderRadius: '16px',
-                padding: '12px 0',
-                boxShadow: '0 8px 32px rgba(0, 51, 102, 0.1), inset 0 1px 0 rgba(255,255,255,0.8)',
-                zIndex: 30,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '2px'
-            }}>
-                {options.map((option) => (
-                    <div
-                        key={option}
-                        style={{
-                            padding: '12px 24px',
-                            fontSize: '15px',
-                            fontWeight: '500',
-                            color: '#003366',
-                            cursor: 'pointer',
-                            textAlign: 'center',
-                            transition: 'background 0.15s ease'
-                        }}
-                        onMouseEnter={(e) => e.target.style.background = 'rgba(0, 51, 102, 0.05)'}
-                        onMouseLeave={(e) => e.target.style.background = 'transparent'}
-                    >
-                        {option}
-                    </div>
-                ))}
-            </div>
-        )}
-    </div>
-);
+    const handleOptionClick = (option) => {
+        if (option === 'Other...') {
+            setShowCustomInput(true);
+        } else {
+            onChange(option);
+            onToggle();
+        }
+    };
+
+    const handleCustomSubmit = () => {
+        if (customValue.trim()) {
+            onChange(customValue.trim());
+            setCustomValue('');
+            setShowCustomInput(false);
+            onToggle();
+        }
+    };
+
+    return (
+        <div style={{ position: 'relative', flex: 1 }}>
+            <button
+                onClick={onToggle}
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    minHeight: '60px',
+                    padding: '18px 24px',
+                    borderRadius: '16px',
+                    border: 'none',
+                    background: 'rgba(255, 255, 255, 0.7)',
+                    backdropFilter: 'blur(12px)',
+                    boxShadow: '0 4px 20px rgba(0, 51, 102, 0.06), inset 0 1px 0 rgba(255,255,255,0.8)',
+                    fontSize: '15px',
+                    fontWeight: '500',
+                    color: '#003366',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    transition: 'all 0.2s ease',
+                    fontFamily: 'inherit',
+                    boxSizing: 'border-box'
+                }}
+            >
+                <span>
+                    {label}{value && ' : '}
+                    {value && <em style={{ fontStyle: 'italic', fontWeight: '600' }}>{value}</em>}
+                </span>
+                {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </button>
+
+            {isOpen && options && (
+                <div style={{
+                    position: 'absolute',
+                    bottom: '110%',
+                    left: 0,
+                    right: 0,
+                    background: 'rgba(255, 255, 255, 0.85)',
+                    backdropFilter: 'blur(16px)',
+                    borderRadius: '16px',
+                    padding: '12px 0',
+                    boxShadow: '0 8px 32px rgba(0, 51, 102, 0.1), inset 0 1px 0 rgba(255,255,255,0.8)',
+                    zIndex: 30,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px'
+                }}>
+                    {!showCustomInput ? (
+                        options.map((option) => (
+                            <div
+                                key={option}
+                                onClick={() => handleOptionClick(option)}
+                                style={{
+                                    padding: '12px 24px',
+                                    fontSize: '15px',
+                                    fontWeight: '500',
+                                    color: '#003366',
+                                    cursor: 'pointer',
+                                    textAlign: 'center',
+                                    transition: 'background 0.15s ease'
+                                }}
+                                onMouseEnter={(e) => e.target.style.background = 'rgba(0, 51, 102, 0.05)'}
+                                onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                            >
+                                {option}
+                            </div>
+                        ))
+                    ) : (
+                        <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <input
+                                type="text"
+                                value={customValue}
+                                onChange={(e) => setCustomValue(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleCustomSubmit();
+                                    if (e.key === 'Escape') {
+                                        setShowCustomInput(false);
+                                        setCustomValue('');
+                                    }
+                                }}
+                                placeholder={`Enter ${label.toLowerCase()}...`}
+                                autoFocus
+                                style={{
+                                    padding: '10px 12px',
+                                    border: '1px solid rgba(0, 51, 102, 0.2)',
+                                    borderRadius: '8px',
+                                    fontSize: '14px',
+                                    fontFamily: 'inherit',
+                                    outline: 'none'
+                                }}
+                            />
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                                <button
+                                    onClick={() => {
+                                        setShowCustomInput(false);
+                                        setCustomValue('');
+                                    }}
+                                    style={{
+                                        padding: '6px 12px',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        fontSize: '13px',
+                                        cursor: 'pointer',
+                                        background: 'transparent',
+                                        color: '#64748b',
+                                        fontFamily: 'inherit'
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleCustomSubmit}
+                                    style={{
+                                        padding: '6px 12px',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        fontSize: '13px',
+                                        cursor: 'pointer',
+                                        background: '#003366',
+                                        color: 'white',
+                                        fontFamily: 'inherit'
+                                    }}
+                                >
+                                    OK
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+};
 
 /* ─── Sample documents data ─── */
 const DOCUMENTS = [
@@ -332,6 +418,9 @@ const Chat = () => {
     const [activeCategory, setActiveCategory] = useState('All Documents');
     const [isDragOver, setIsDragOver] = useState(false);
     const [uploadedFiles, setUploadedFiles] = useState([]);
+    const [studentCountry, setStudentCountry] = useState('Singapore');
+    const [institution, setInstitution] = useState('Carnegie Mellon University');
+    const [topic, setTopic] = useState(null);
     const inputRef = useRef(null);
     const fileInputRef = useRef(null);
 
@@ -346,6 +435,17 @@ const Chat = () => {
         const userMessage = query.trim();
         let messageText = userMessage;
         let fileContents = [];
+
+        // Add user context from dropdowns
+        let contextPrefix = '';
+        if (studentCountry || institution || topic) {
+            contextPrefix = '[User Context: ';
+            const contexts = [];
+            if (studentCountry) contexts.push(`Student from ${studentCountry}`);
+            if (institution) contexts.push(`Studying at ${institution}`);
+            if (topic) contexts.push(`Topic: ${topic}`);
+            contextPrefix += contexts.join(', ') + ']\n\n';
+        }
 
         // Upload files if any
         if (uploadedFiles.length > 0) {
@@ -379,7 +479,10 @@ const Chat = () => {
                 text: msg.text
             }));
 
-            const result = await api.chat(messageText, history, fileContents);
+            // Add context prefix to the actual message sent to Claude
+            const messageWithContext = contextPrefix + messageText;
+
+            const result = await api.chat(messageWithContext, history, fileContents);
             if (result.answer) {
                 setMessages(prev => [...prev, { role: 'assistant', text: result.answer }]);
             }
@@ -565,23 +668,26 @@ const Chat = () => {
                     <div style={{ display: 'flex', gap: '12px', marginBottom: '12px', alignItems: 'stretch' }}>
                         <FilterDropdown
                             label="International Student"
-                            value="Singapore"
+                            value={studentCountry}
                             isOpen={openDropdown === 'student'}
                             onToggle={() => toggleDropdown('student')}
+                            onChange={setStudentCountry}
                             options={['Singapore', 'India', 'China', 'South Korea', 'Japan', 'Other...']}
                         />
                         <FilterDropdown
                             label="Institution"
-                            value="Carnegie Mellon University"
+                            value={institution}
                             isOpen={openDropdown === 'institution'}
                             onToggle={() => toggleDropdown('institution')}
+                            onChange={setInstitution}
                             options={['Carnegie Mellon University', 'MIT', 'Stanford', 'Harvard', 'Other...']}
                         />
                         <FilterDropdown
                             label="Topic"
-                            value={null}
+                            value={topic}
                             isOpen={openDropdown === 'topic'}
                             onToggle={() => toggleDropdown('topic')}
+                            onChange={setTopic}
                             options={['Work Visa', 'Financial Support', 'Immigration', 'Other...']}
                         />
                     </div>
@@ -685,7 +791,7 @@ const Chat = () => {
                                 transition: 'all 0.2s ease'
                             }}
                         >
-                            <Paperclip size={20} color="#003366" />
+                            <Paperclip size={24} color="#003366" />
                         </button>
                         <button
                             onClick={handleSend}
@@ -704,7 +810,7 @@ const Chat = () => {
                                 opacity: (query.trim() || uploadedFiles.length > 0) ? 0.8 : 0.35
                             }}
                         >
-                            <Send size={20} color="#003366" />
+                            <Send size={24} color="#003366" />
                         </button>
                     </div>
                 </div>
