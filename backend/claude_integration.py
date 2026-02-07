@@ -193,33 +193,44 @@ class ClaudeIntegration:
         if not conversation_history or len(conversation_history) == 0:
             return []
 
-        system_prompt = """You are building a timeline for a user who chatted with an immigration assistant (LEGOL).
+        system_prompt = """You are analyzing a conversation between a user and LEGOL (an immigration assistant) to extract actionable timeline items.
 
-From the user's messages, infer: country/citizenship (e.g. Korean, dual US), institution (e.g. CMU), and what they need (financial aid, military, etc.). Then output a COMPLETE timeline. Each of the following must be its OWN separate item in the "items" array—do NOT merge them into 2–3 broad items.
+Your task:
+1. Read the conversation carefully to understand the user's situation: their country of origin, institution (if student), visa type, immigration goals, and specific needs
+2. Extract ALL action items, steps, forms, documents, and deadlines that are relevant to their situation
+3. Create a comprehensive timeline with each step as a SEPARATE item
 
-MUST include as SEPARATE items when the user needs financial aid:
-1. "FAFSA / Federal Student Aid" – Apply for federal aid (dual citizens may qualify). relatedDocuments: FAFSA, Tax Returns, Income Documentation.
-2. "[Institution] Financial Aid Office" – Contact [use school name from chat, e.g. CMU] financial aid office for eligibility, deadlines, required docs. relatedDocuments: Financial Aid Application, Bank Statements, Proof of Enrollment.
-3. "[Institution] Scholarships & Aid" – Scholarships, grants, TA/RA positions, on-campus employment. relatedDocuments: Scholarship Applications, CMU Financial Aid Forms, Financial Documentation.
+Guidelines:
+- Be specific to their situation (country, visa type, institution, etc.)
+- Include government forms and documents (I-20, DS-160, visa applications, work permits, etc.)
+- Include institutional steps (financial aid office, DSO office, registrar, etc.)
+- Include agency/embassy consultations when relevant
+- Include deadlines and time-sensitive items
+- Each item should be actionable and clear
 
-MUST include as SEPARATE items when the user is Korean and mentions military / dual citizenship:
-4. "Selective Service Registration" – Register when 18 for federal aid and government job eligibility (U.S. requirement for dual citizens). relatedDocuments: Selective Service Registration.
-5. "Korean Military – Medical Exam" – Complete physical/medical examination for military service eligibility. relatedDocuments: Military Medical Exam, Medical Records.
-6. "Korean Military – Exemption / Waiver Eligibility" – Determine if you qualify to skip or reduce service (residency, when you got U.S. citizenship, etc.). Consult embassy or military specialist. relatedDocuments: Passport, Citizenship docs, Residency proof.
-7. "Korean Military – Deferment" – If in school: request deferment with enrollment proof. relatedDocuments: Military Service Deferment Form, Certificate of Enrollment, Passport, National ID.
-8. "Korean Military – Postponement" – If completing studies: apply for postponement. relatedDocuments: Application for Postponement of Military Service, Certificate of Enrollment, Academic transcript, Expected graduation date.
-9. "Korean Embassy / Consulate" – Consult for exact requirements, forms, and procedures. relatedDocuments: South Korean Passport, National ID, Required forms.
+Common immigration topics to address when mentioned:
+- Student visas (F-1): I-20, SEVIS fee, DS-160, visa interview, arrival, maintaining status
+- Work authorization: CPT, OPT, H-1B, EAD applications
+- Financial aid: FAFSA, institutional aid, scholarship applications
+- Status changes: adjustment of status, extensions, transfers
+- Country-specific requirements: military service obligations, dual citizenship issues, embassy requirements
 
-For each item: title (short), description (one sentence), relatedDocuments (array of form/document names).
+Output Format (JSON only, no markdown):
+{
+  "items": [
+    {
+      "title": "Short descriptive title",
+      "description": "One clear sentence explaining what needs to be done and why",
+      "relatedDocuments": ["Document 1", "Form 2", "Required ID 3"]
+    }
+  ]
+}
 
-Output valid JSON only, no markdown. Format:
-{"items": [
-  {"title": "...", "description": "...", "relatedDocuments": ["...", "..."]},
-  ...
-]}
-
-Rules:
-- Output at least the 9 items above when the user says they are Korean with dual citizenship and need financial aid and military service. Use the institution name from the chat (e.g. CMU). Do not collapse into 3 items."""
+IMPORTANT:
+- Only extract items that are relevant to what was discussed in the conversation
+- Be comprehensive but specific to their situation
+- Each major step should be its own item (don't merge related steps)
+- If the conversation is too brief or vague, return fewer, more general items"""
 
         # Build messages for Claude (same format as chat)
         messages = []
@@ -237,7 +248,7 @@ Rules:
         for msg in messages:
             user_content += f"{msg['role'].upper()}:\n{msg['content']}\n\n"
 
-        user_content += "\nFrom the user's message(s) above, infer their situation (country, citizenship, institution, and what they need—e.g. financial aid, military service). Then output a COMPLETE timeline: all standard steps and documents for (1) government + institution financial aid and (2) U.S. and Korean military obligations, including medical exams, eligibility for exemption/skipping service, deferment, postponement, and all related forms. Use the institution name from the chat. Output JSON only."
+        user_content += "\nAnalyze the conversation above and extract a comprehensive timeline of action items based on what was discussed. Identify the user's situation and needs, then provide specific, actionable steps they should take. Output JSON only."
 
         try:
             response = self.client.messages.create(
