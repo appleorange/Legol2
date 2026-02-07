@@ -79,7 +79,7 @@ const Navbar = ({ activePage = 'Timeline' }) => {
                     onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
                 >Sign In</span>
                 <button
-                    onClick={() => navigate('/login')}
+                    onClick={() => navigate('/account')}
                     style={{
                         background: '#003366',
                         color: 'white',

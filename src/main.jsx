@@ -9,6 +9,7 @@ import Chat from './components/Chat.jsx'
 import Resources from './components/Resources.jsx'
 import Login from './components/Login.jsx'
 import Flowchart from './components/Flowchart.jsx'
+import Account from './components/Account.jsx'
 import { ChatProvider } from './context/ChatContext.jsx'
 
 const pageVariants = {
@@ -28,6 +29,7 @@ function AnimatedRoutes() {
         <Route path="/resources" element={<motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit"><Resources /></motion.div>} />
         <Route path="/login" element={<motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit"><Login /></motion.div>} />
         <Route path="/flowchart" element={<motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit"><Flowchart /></motion.div>} />
+        <Route path="/account" element={<motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit"><Account /></motion.div>} />
       </Routes>
     </AnimatePresence>
   )

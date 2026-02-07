@@ -81,7 +81,7 @@ const Navbar = () => {
                     style={{ fontSize: '14px', fontWeight: '600', color: '#003366', cursor: 'default', opacity: 0.5 }}
                 >Sign In</span>
                 <button
-                    onClick={() => navigate('/login')}
+                    onClick={() => navigate('/account')}
                     style={{
                         background: '#003366',
                         color: 'white',
@@ -170,8 +170,8 @@ const Login = () => {
                 }));
             }
 
-            // Navigate to home page
-            navigate('/');
+            // Navigate to account page
+            navigate('/account');
         } catch (error) {
             console.error('Authentication error:', error);
 
@@ -213,8 +213,8 @@ const Login = () => {
                 photoURL: user.photoURL
             }));
 
-            // Navigate to home page
-            navigate('/');
+            // Navigate to account page
+            navigate('/account');
         } catch (error) {
             console.error('Error signing in with Google:', error);
             setError(error.message || 'Failed to sign in with Google. Please try again.');
@@ -253,7 +253,7 @@ const Login = () => {
                 isSchoolEmail: isSchoolEmail
             }));
 
-            navigate('/');
+            navigate('/account');
         } catch (error) {
             console.error('Error signing in with school email:', error);
             setError(error.message || 'Failed to sign in. Please try again.');
