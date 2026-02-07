@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Send, ChevronDown, ChevronUp, CheckCircle, AlertCircle, Paperclip, X } from 'lucide-react';
+import { Send, ChevronDown, ChevronUp, CheckCircle, AlertCircle, Paperclip, X, GitBranch, ExternalLink } from 'lucide-react';
 import { api } from '../api';
 import { useChatContext } from '../context/ChatContext';
 
@@ -347,6 +347,7 @@ const DOC_CATEGORIES = ['All Documents', 'Identity', 'Applications', 'Financial'
 
 /* ─── Document Card (draggable) ─── */
 const DocumentCard = ({ doc }) => {
+    const navigate = useNavigate();
     const isVerified = doc.status === 'VERIFIED';
 
     const handleDragStart = (e) => {
@@ -389,7 +390,7 @@ const DocumentCard = ({ doc }) => {
 
                 {/* Content */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
                         <h4 style={{
                             margin: 0,
                             fontSize: '15px',
@@ -399,16 +400,40 @@ const DocumentCard = ({ doc }) => {
                         }}>
                             {doc.title}
                         </h4>
-                        <span style={{
-                            fontSize: '11px',
-                            fontWeight: '700',
-                            color: isVerified ? '#155724' : '#004085',
-                            letterSpacing: '0.3px',
-                            flexShrink: 0,
-                            paddingTop: '2px'
-                        }}>
-                            {doc.status}
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); navigate(`/flowchart?doc=${doc.id}`); }}
+                                title="View in Flowchart"
+                                style={{
+                                    background: 'rgba(0,51,102,0.04)',
+                                    border: '1px solid rgba(0,51,102,0.08)',
+                                    borderRadius: '6px',
+                                    padding: '3px',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    transition: 'all 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'rgba(0,51,102,0.1)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'rgba(0,51,102,0.04)';
+                                }}
+                            >
+                                <GitBranch size={13} color="#003366" />
+                            </button>
+                            <span style={{
+                                fontSize: '11px',
+                                fontWeight: '700',
+                                color: isVerified ? '#155724' : '#004085',
+                                letterSpacing: '0.3px',
+                                paddingTop: '2px'
+                            }}>
+                                {doc.status}
+                            </span>
+                        </div>
                     </div>
 
                     <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '4px' }}>
@@ -437,6 +462,7 @@ const DocumentCard = ({ doc }) => {
 
 /* ─── Main Chat Page ─── */
 const Chat = () => {
+    const navigate = useNavigate();
     const [query, setQuery] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(null);
@@ -1035,6 +1061,34 @@ const Chat = () => {
                     overflow: 'hidden',
                     gap: '16px'
                 }}>
+                    {/* Panel Header with Flowchart link */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '15px', fontWeight: '600', color: '#003366' }}>Documents</span>
+                        <button
+                            onClick={() => navigate('/flowchart')}
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: '6px',
+                                padding: '8px 16px', borderRadius: '10px',
+                                background: 'rgba(0, 51, 102, 0.06)',
+                                border: '1px solid rgba(0, 51, 102, 0.1)',
+                                color: '#003366', fontSize: '12px', fontWeight: '600',
+                                cursor: 'pointer', backdropFilter: 'blur(8px)',
+                                transition: 'all 0.25s ease', fontFamily: 'inherit'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = 'rgba(0, 51, 102, 0.1)';
+                                e.currentTarget.style.transform = 'translateY(-1px)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = 'rgba(0, 51, 102, 0.06)';
+                                e.currentTarget.style.transform = 'translateY(0)';
+                            }}
+                        >
+                            <GitBranch size={13} />
+                            View Flowchart
+                        </button>
+                    </div>
+
                     {/* Category Chips */}
                     <div style={{
                         display: 'flex',
