@@ -51,7 +51,20 @@ const Navbar = ({ activePage = 'Chat' }) => {
                             color: item === activePage ? '#003366' : '#64748b',
                             cursor: 'pointer',
                             background: item === activePage ? '#FFFFFF' : 'transparent',
-                            boxShadow: item === activePage ? '0 2px 4px rgba(0,0,0,0.05)' : 'none'
+                            boxShadow: item === activePage ? '0 2px 4px rgba(0,0,0,0.05)' : 'none',
+                            transition: 'all 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                            if (item !== activePage) {
+                                e.currentTarget.style.color = '#003366';
+                                e.currentTarget.style.background = 'rgba(255,255,255,0.5)';
+                            }
+                        }}
+                        onMouseLeave={(e) => {
+                            if (item !== activePage) {
+                                e.currentTarget.style.color = '#64748b';
+                                e.currentTarget.style.background = 'transparent';
+                            }
                         }}>
                         {item}
                     </div>
@@ -59,18 +72,35 @@ const Navbar = ({ activePage = 'Chat' }) => {
             </div>
 
             <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-                <span style={{ fontSize: '14px', fontWeight: '500', color: '#003366', cursor: 'pointer' }}>Sign Out</span>
-                <button style={{
-                    background: '#003366',
-                    color: 'white',
-                    padding: '12px 28px',
-                    borderRadius: '8px',
-                    border: 'none',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 6px rgba(0, 51, 102, 0.2)'
-                }}>My Profile</button>
+                <span
+                    onClick={() => navigate('/login')}
+                    style={{ fontSize: '14px', fontWeight: '500', color: '#003366', cursor: 'pointer', transition: 'opacity 0.25s ease' }}
+                    onMouseEnter={(e) => e.currentTarget.style.opacity = '0.6'}
+                    onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                >Sign In</span>
+                <button
+                    onClick={() => navigate('/login')}
+                    style={{
+                        background: '#003366',
+                        color: 'white',
+                        padding: '12px 28px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 6px rgba(0, 51, 102, 0.2)',
+                        transition: 'transform 0.25s ease, box-shadow 0.25s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                        e.currentTarget.style.boxShadow = '0 6px 14px rgba(0, 51, 102, 0.3)';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 51, 102, 0.2)';
+                    }}
+                >My Profile</button>
             </div>
         </nav>
     );
