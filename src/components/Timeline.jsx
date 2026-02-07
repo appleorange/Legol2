@@ -131,7 +131,11 @@ const Navbar = () => {
             }}>
                 {['Home', 'Chat', 'Timeline', 'Resources'].map((item, i) => (
                     <div key={item}
-                        onClick={() => (item === 'Home' || item === 'Chat') ? navigate('/') : null}
+                        onClick={() => {
+                            if (item === 'Home') navigate('/');
+                            if (item === 'Chat') navigate('/chat');
+                            if (item === 'Timeline') navigate('/timeline');
+                        }}
                         style={{
                             padding: '10px 24px',
                             borderRadius: '100px',
