@@ -117,11 +117,12 @@ const Navbar = () => {
                 display: 'flex',
                 gap: '4px'
             }}>
-                {['Home', 'Chat', 'Timeline', 'Resources'].map((item, i) => (
+                {['Home', 'Chat', 'Flowchart', 'Timeline', 'Resources'].map((item, i) => (
                     <div key={item}
                         onClick={() => {
                             if (item === 'Home') navigate('/');
                             if (item === 'Chat') navigate('/chat');
+                            if (item === 'Flowchart') navigate('/flowchart');
                             if (item === 'Timeline') navigate('/timeline');
                             if (item === 'Resources') navigate('/resources');
                         }}

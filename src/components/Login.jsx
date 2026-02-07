@@ -14,7 +14,7 @@ import {
 /* ─── Navbar (consistent with other pages) ─── */
 const Navbar = () => {
     const navigate = useNavigate();
-    const navItems = ['Home', 'Chat', 'Timeline', 'Resources'];
+    const navItems = ['Home', 'Chat', 'Flowchart', 'Timeline', 'Resources'];
 
     return (
         <motion.nav
@@ -49,6 +49,7 @@ const Navbar = () => {
                         onClick={() => {
                             if (item === 'Home') navigate('/');
                             if (item === 'Chat') navigate('/chat');
+                            if (item === 'Flowchart') navigate('/flowchart');
                             if (item === 'Timeline') navigate('/timeline');
                             if (item === 'Resources') navigate('/resources');
                         }}
