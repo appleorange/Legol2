@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Send, ChevronDown, ChevronUp, CheckCircle, AlertCircle } from 'lucide-react';
+import { Send, ChevronDown, ChevronUp, CheckCircle, AlertCircle, Paperclip, X } from 'lucide-react';
 import { api } from '../api';
 
 /* ─── Navbar ─── */
@@ -331,7 +331,9 @@ const Chat = () => {
     const [openDropdown, setOpenDropdown] = useState(null);
     const [activeCategory, setActiveCategory] = useState('All Documents');
     const [isDragOver, setIsDragOver] = useState(false);
+    const [uploadedFiles, setUploadedFiles] = useState([]);
     const inputRef = useRef(null);
+    const fileInputRef = useRef(null);
 
     const filteredDocs = activeCategory === 'All Documents'
         ? DOCUMENTS
@@ -339,20 +341,47 @@ const Chat = () => {
 
     /* ── Send message ── */
     const handleSend = async () => {
-        if (!query.trim() || isLoading) return;
+        if ((!query.trim() && uploadedFiles.length === 0) || isLoading) return;
 
         const userMessage = query.trim();
-        setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
+        let messageText = userMessage;
+
+        // Upload files if any
+        if (uploadedFiles.length > 0) {
+            try {
+                const uploadResult = await api.uploadFiles(uploadedFiles);
+                const fileNames = uploadResult.files.map(f => f.filename).join(', ');
+                messageText = userMessage
+                    ? `${userMessage}\n\n[Uploaded files: ${fileNames}]`
+                    : `[Uploaded files: ${fileNames}]`;
+            } catch (err) {
+                console.error('File upload failed:', err);
+                setMessages(prev => [...prev, { role: 'assistant', text: 'Sorry, file upload failed. Please try again.' }]);
+                setIsLoading(false);
+                return;
+            }
+        }
+
+        const newMessages = [...messages, { role: 'user', text: messageText }];
+        setMessages(newMessages);
         setQuery('');
+        setUploadedFiles([]);
         setIsLoading(true);
 
         try {
-            const result = await api.sendQuery(userMessage);
+            // Send conversation history for context (excluding the initial greeting)
+            const history = newMessages.slice(1).map(msg => ({
+                role: msg.role,
+                text: msg.text
+            }));
+
+            const result = await api.chat(messageText, history);
             if (result.answer) {
                 setMessages(prev => [...prev, { role: 'assistant', text: result.answer }]);
             }
         } catch (err) {
             console.error('Chat query failed:', err);
+            setMessages(prev => [...prev, { role: 'assistant', text: 'Sorry, I encountered an error. Please try again.' }]);
         } finally {
             setIsLoading(false);
         }
@@ -367,6 +396,19 @@ const Chat = () => {
 
     const toggleDropdown = (name) => {
         setOpenDropdown(prev => prev === name ? null : name);
+    };
+
+    const handleFileSelect = (e) => {
+        const files = Array.from(e.target.files);
+        setUploadedFiles(prev => [...prev, ...files]);
+    };
+
+    const handleFileButtonClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const removeFile = (index) => {
+        setUploadedFiles(prev => prev.filter((_, i) => i !== index));
     };
 
     /* ── Drag-and-drop handlers for the input area ── */
@@ -540,6 +582,47 @@ const Chat = () => {
                         />
                     </div>
 
+                    {/* Uploaded Files Display */}
+                    {uploadedFiles.length > 0 && (
+                        <div style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: '8px',
+                            marginBottom: '8px'
+                        }}>
+                            {uploadedFiles.map((file, index) => (
+                                <div
+                                    key={index}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        padding: '8px 12px',
+                                        background: 'rgba(0, 51, 102, 0.08)',
+                                        borderRadius: '8px',
+                                        fontSize: '13px',
+                                        color: '#003366'
+                                    }}
+                                >
+                                    <span>{file.name}</span>
+                                    <button
+                                        onClick={() => removeFile(index)}
+                                        style={{
+                                            background: 'none',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            padding: '2px',
+                                            display: 'flex',
+                                            alignItems: 'center'
+                                        }}
+                                    >
+                                        <X size={14} color="#003366" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
                     {/* Input Bar (drop target) */}
                     <div
                         onDragOver={handleDragOver}
@@ -576,21 +659,45 @@ const Chat = () => {
                                 padding: '12px 0'
                             }}
                         />
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            multiple
+                            onChange={handleFileSelect}
+                            style={{ display: 'none' }}
+                        />
                         <button
-                            onClick={handleSend}
-                            disabled={isLoading || !query.trim()}
+                            onClick={handleFileButtonClick}
                             style={{
                                 width: '44px',
                                 height: '44px',
                                 borderRadius: '12px',
                                 border: 'none',
                                 background: 'transparent',
-                                cursor: query.trim() ? 'pointer' : 'default',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'all 0.2s ease'
+                            }}
+                        >
+                            <Paperclip size={20} color="#003366" />
+                        </button>
+                        <button
+                            onClick={handleSend}
+                            disabled={isLoading || (!query.trim() && uploadedFiles.length === 0)}
+                            style={{
+                                width: '44px',
+                                height: '44px',
+                                borderRadius: '12px',
+                                border: 'none',
+                                background: 'transparent',
+                                cursor: (query.trim() || uploadedFiles.length > 0) ? 'pointer' : 'default',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 transition: 'all 0.2s ease',
-                                opacity: query.trim() ? 0.8 : 0.35
+                                opacity: (query.trim() || uploadedFiles.length > 0) ? 0.8 : 0.35
                             }}
                         >
                             <Send size={20} color="#003366" />

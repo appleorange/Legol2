@@ -91,3 +91,54 @@ class ClaudeIntegration:
         except Exception as e:
             print(f"Error calling Claude: {e}")
             return {"new_nodes": [], "new_edges": []}
+
+    def chat(self, query_text, conversation_history=None):
+        """
+        Sends a conversational query to Claude and returns a natural language response.
+        For use in the chat interface.
+        """
+        system_prompt = """
+        You are LEGOL, a helpful immigration assistant specializing in U.S. immigration law,
+        visa processes, work permits, dual citizenship, document requirements, and related topics.
+
+        Provide clear, accurate, and helpful responses to user questions. Be conversational but professional.
+        If you're unsure about specific legal advice, recommend consulting with an immigration attorney.
+        Focus on providing general guidance, process explanations, and document requirements.
+        """
+
+        messages = []
+
+        # Add conversation history if provided
+        if conversation_history:
+            for msg in conversation_history:
+                # Skip the initial assistant greeting if it's in the history
+                if msg.get("role") == "assistant" and "LEGOL immigration assistant" in msg.get("text", ""):
+                    continue
+                messages.append({
+                    "role": msg.get("role"),
+                    "content": msg.get("text")
+                })
+
+        # Add current query
+        messages.append({
+            "role": "user",
+            "content": query_text
+        })
+
+        try:
+            print(f"Sending request to Claude with {len(messages)} messages")
+            response = self.client.messages.create(
+                model="claude-3-haiku-20240307",
+                max_tokens=2048,
+                temperature=0.7,
+                system=system_prompt,
+                messages=messages
+            )
+            print(f"Received response from Claude")
+            return response.content[0].text
+
+        except Exception as e:
+            print(f"Error calling Claude for chat: {type(e).__name__}: {e}")
+            import traceback
+            traceback.print_exc()
+            return "I apologize, but I'm having trouble processing your request right now. Please try again."

@@ -3,9 +3,15 @@ from flask_cors import CORS
 from graph_manager import GraphManager
 from claude_integration import ClaudeIntegration
 import os
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 CORS(app)
+
+UPLOAD_FOLDER = 'uploads'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 graph_manager = GraphManager()
 claude_integration = ClaudeIntegration()
@@ -74,6 +80,47 @@ def query_graph():
         "message": "Graph updated", 
         "updates": updates,
         "graph": graph_manager.get_graph_data()
+    }), 200
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    data = request.json
+    query_text = data.get('query')
+    conversation_history = data.get('history', [])
+
+    if not query_text:
+        return jsonify({"error": "No query provided"}), 400
+
+    # Call Claude for conversational response
+    answer = claude_integration.chat(query_text, conversation_history)
+
+    return jsonify({
+        "answer": answer
+    }), 200
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'files' not in request.files:
+        return jsonify({"error": "No files provided"}), 400
+
+    files = request.files.getlist('files')
+    uploaded_files = []
+
+    for file in files:
+        if file.filename == '':
+            continue
+
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+        uploaded_files.append({
+            'filename': filename,
+            'path': filepath
+        })
+
+    return jsonify({
+        "message": "Files uploaded successfully",
+        "files": uploaded_files
     }), 200
 
 @app.route('/clear', methods=['POST'])
