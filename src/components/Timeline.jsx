@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Calendar, FileText, Clock, CheckCircle, ChevronRight, ThumbsUp, ThumbsDown, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -103,62 +104,66 @@ const TimelineEvent = ({ status, title, date, location, description, isLast }) =
     );
 };
 
-const Navbar = () => (
-    <nav style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '32px 64px',
-        width: '100%',
-        position: 'absolute',
-        top: 0,
-        zIndex: 20,
-        boxSizing: 'border-box'
-    }}>
-        <div style={{ fontSize: '24px', fontWeight: '700', color: '#003366', cursor: 'pointer' }} onClick={() => window.location.href = '/'}>LEGOL</div>
+const Navbar = () => {
+    const navigate = useNavigate();
 
-        <div style={{
-            background: 'rgba(230, 235, 240, 0.6)',
-            backdropFilter: 'blur(10px)',
-            padding: '4px 6px',
-            borderRadius: '100px',
+    return (
+        <nav style={{
             display: 'flex',
-            gap: '4px'
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '32px 64px',
+            width: '100%',
+            position: 'absolute',
+            top: 0,
+            zIndex: 20,
+            boxSizing: 'border-box'
         }}>
-            {['Home', 'Documents', 'Timeline', 'Resources'].map((item, i) => (
-                <div key={item}
-                    onClick={() => item === 'Home' ? window.location.href = '/' : null}
-                    style={{
-                        padding: '10px 24px',
-                        borderRadius: '100px',
-                        fontSize: '14px',
-                        fontWeight: item === 'Timeline' ? '600' : '500',
-                        color: item === 'Timeline' ? '#003366' : '#64748b',
-                        cursor: 'pointer',
-                        background: item === 'Timeline' ? '#FFFFFF' : 'transparent',
-                        boxShadow: item === 'Timeline' ? '0 2px 4px rgba(0,0,0,0.05)' : 'none'
-                    }}>
-                    {item}
-                </div>
-            ))}
-        </div>
+            <div style={{ fontSize: '24px', fontWeight: '700', color: '#003366', cursor: 'pointer' }} onClick={() => navigate('/')}>LEGOL</div>
 
-        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-            <span style={{ fontSize: '14px', fontWeight: '500', color: '#003366', cursor: 'pointer' }}>Sign Out</span>
-            <button style={{
-                background: '#003366',
-                color: 'white',
-                padding: '12px 28px',
-                borderRadius: '8px',
-                border: 'none',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                boxShadow: '0 4px 6px rgba(0, 51, 102, 0.2)'
-            }}>My Profile</button>
-        </div>
-    </nav>
-);
+            <div style={{
+                background: 'rgba(230, 235, 240, 0.6)',
+                backdropFilter: 'blur(10px)',
+                padding: '4px 6px',
+                borderRadius: '100px',
+                display: 'flex',
+                gap: '4px'
+            }}>
+                {['Home', 'Documents', 'Timeline', 'Resources'].map((item, i) => (
+                    <div key={item}
+                        onClick={() => item === 'Home' ? navigate('/') : null}
+                        style={{
+                            padding: '10px 24px',
+                            borderRadius: '100px',
+                            fontSize: '14px',
+                            fontWeight: item === 'Timeline' ? '600' : '500',
+                            color: item === 'Timeline' ? '#003366' : '#64748b',
+                            cursor: 'pointer',
+                            background: item === 'Timeline' ? '#FFFFFF' : 'transparent',
+                            boxShadow: item === 'Timeline' ? '0 2px 4px rgba(0,0,0,0.05)' : 'none'
+                        }}>
+                        {item}
+                    </div>
+                ))}
+            </div>
+
+            <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+                <span style={{ fontSize: '14px', fontWeight: '500', color: '#003366', cursor: 'pointer' }}>Sign Out</span>
+                <button style={{
+                    background: '#003366',
+                    color: 'white',
+                    padding: '12px 28px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 6px rgba(0, 51, 102, 0.2)'
+                }}>My Profile</button>
+            </div>
+        </nav>
+    );
+};
 
 const Timeline = () => {
     const [activeTab, setActiveTab] = useState('All Events');

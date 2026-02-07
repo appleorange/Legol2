@@ -1,66 +1,71 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Sun, Star, Monitor, ShoppingBag, Terminal } from 'lucide-react';
 
-const Navbar = () => (
-    <nav style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '32px 64px',
-        width: '100%',
-        position: 'absolute',
-        top: 0,
-        zIndex: 20,
-        boxSizing: 'border-box'
-    }}>
-        <div style={{ fontSize: '24px', fontWeight: '700', color: '#003366' }}>LEGOL</div>
+const Navbar = () => {
+    const navigate = useNavigate();
 
-        <div style={{
-            background: 'rgba(230, 235, 240, 0.6)',
-            backdropFilter: 'blur(10px)',
-            padding: '4px 6px',
-            borderRadius: '100px',
+    return (
+        <nav style={{
             display: 'flex',
-            gap: '4px'
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '32px 64px',
+            width: '100%',
+            position: 'absolute',
+            top: 0,
+            zIndex: 20,
+            boxSizing: 'border-box'
         }}>
-            {['Home', 'Documents', 'Timeline', 'Resources'].map((item, i) => (
-                <div key={item}
-                    onClick={() => {
-                        if (item === 'Timeline') window.location.href = '/timeline';
-                        if (item === 'Home') window.location.href = '/';
-                    }}
-                    style={{
-                        padding: '10px 24px',
-                        borderRadius: '100px',
-                        fontSize: '14px',
-                        fontWeight: i === 0 ? '600' : '500',
-                        color: i === 0 ? '#003366' : '#64748b',
-                        cursor: 'pointer',
-                        background: i === 0 ? '#FFFFFF' : 'transparent',
-                        boxShadow: i === 0 ? '0 2px 4px rgba(0,0,0,0.05)' : 'none'
-                    }}>
-                    {item}
-                </div>
-            ))}
-        </div>
+            <div style={{ fontSize: '24px', fontWeight: '700', color: '#003366' }}>LEGOL</div>
 
-        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-            <span style={{ fontSize: '14px', fontWeight: '500', color: '#003366', cursor: 'pointer' }}>Sign Out</span>
-            <button style={{
-                background: '#003366',
-                color: 'white',
-                padding: '12px 28px',
-                borderRadius: '8px',
-                border: 'none',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                boxShadow: '0 4px 6px rgba(0, 51, 102, 0.2)'
-            }}>My Profile</button>
-        </div>
-    </nav>
-);
+            <div style={{
+                background: 'rgba(230, 235, 240, 0.6)',
+                backdropFilter: 'blur(10px)',
+                padding: '4px 6px',
+                borderRadius: '100px',
+                display: 'flex',
+                gap: '4px'
+            }}>
+                {['Home', 'Documents', 'Timeline', 'Resources'].map((item, i) => (
+                    <div key={item}
+                        onClick={() => {
+                            if (item === 'Timeline') navigate('/timeline');
+                            if (item === 'Home') navigate('/');
+                        }}
+                        style={{
+                            padding: '10px 24px',
+                            borderRadius: '100px',
+                            fontSize: '14px',
+                            fontWeight: i === 0 ? '600' : '500',
+                            color: i === 0 ? '#003366' : '#64748b',
+                            cursor: 'pointer',
+                            background: i === 0 ? '#FFFFFF' : 'transparent',
+                            boxShadow: i === 0 ? '0 2px 4px rgba(0,0,0,0.05)' : 'none'
+                        }}>
+                        {item}
+                    </div>
+                ))}
+            </div>
+
+            <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+                <span style={{ fontSize: '14px', fontWeight: '500', color: '#003366', cursor: 'pointer' }}>Sign Out</span>
+                <button style={{
+                    background: '#003366',
+                    color: 'white',
+                    padding: '12px 28px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 6px rgba(0, 51, 102, 0.2)'
+                }}>My Profile</button>
+            </div>
+        </nav>
+    );
+};
 
 const FeatureCard = ({ icon: Icon, title, subtitle }) => (
     <div style={{
