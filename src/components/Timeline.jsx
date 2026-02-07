@@ -1,111 +1,12 @@
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, FileText, Clock, CheckCircle, ChevronRight, ThumbsUp, ThumbsDown, X } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { CheckCircle, Clock, AlertCircle, ChevronRight } from 'lucide-react';
+import { useChatContext } from '../context/ChatContext';
 
-const TimelineEvent = ({ status, title, date, location, description, isLast }) => {
-    const isCompleted = status === 'COMPLETED';
-    const isCurrent = status === 'CURRENT';
-
-    return (
-        <div style={{ display: 'flex', gap: '24px', position: 'relative' }}>
-            {/* Timeline Line */}
-            {!isLast && (
-                <div style={{
-                    position: 'absolute',
-                    left: '20px',
-                    top: '40px',
-                    bottom: '-24px',
-                    width: '2px',
-                    background: '#003366'
-                }} />
-            )}
-
-            {/* Icon Column */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    background: '#FFFFFF',
-                    border: isCompleted ? '2px solid #28a745' : '2px solid #007bff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: isCompleted ? '#28a745' : '#007bff',
-                    zIndex: 1
-                }}>
-                    {isCompleted ? <CheckCircle size={20} /> : <Clock size={20} />}
-                </div>
-            </div>
-
-            {/* Content Card */}
-            <div style={{
-                flex: 1,
-                background: '#FFFFFF',
-                borderRadius: '16px',
-                border: isCompleted ? '2px solid #28a745' : '2px solid #007bff',
-                padding: '24px',
-                marginBottom: '24px',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
-            }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                    <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#1E272D', margin: 0 }}>{title}</h3>
-                    <span style={{
-                        background: isCompleted ? '#d4edda' : '#cce5ff',
-                        color: isCompleted ? '#155724' : '#004085',
-                        padding: '4px 12px',
-                        borderRadius: '100px',
-                        fontSize: '12px',
-                        fontWeight: '700'
-                    }}>
-                        {status}
-                    </span>
-                </div>
-
-                <div style={{ display: 'flex', gap: '8px', color: '#666', fontSize: '14px', marginBottom: '16px' }}>
-                    <span>{date}</span>
-                    <span>•</span>
-                    <span>{location}</span>
-                </div>
-
-                {description && (
-                    <p style={{ color: '#4a5568', fontSize: '15px', margin: 0 }}>{description}</p>
-                )}
-
-                {/* Example Interaction for Current Item */}
-                {isCurrent && (
-                    <div style={{
-                        marginTop: '16px',
-                        background: '#F8F9FA',
-                        padding: '12px',
-                        borderRadius: '12px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        width: 'fit-content',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div style={{ background: '#28a745', borderRadius: '50%', padding: '2px' }}>
-                                <CheckCircle size={12} color="white" />
-                            </div>
-                            <span style={{ fontSize: '14px', fontWeight: '500' }}>Done! How does this look?</span>
-                        </div>
-                        <div style={{ display: 'flex', gap: '8px', marginLeft: '16px' }}>
-                            <ThumbsUp size={16} color="#666" style={{ cursor: 'pointer' }} />
-                            <ThumbsDown size={16} color="#666" style={{ cursor: 'pointer' }} />
-                            <X size={16} color="#666" style={{ cursor: 'pointer' }} />
-                        </div>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-};
-
-const Navbar = () => {
+/* ─── Navbar ─── */
+const Navbar = ({ activePage = 'Timeline' }) => {
     const navigate = useNavigate();
+    const navItems = ['Home', 'Chat', 'Timeline', 'Resources'];
 
     return (
         <nav style={{
@@ -119,7 +20,12 @@ const Navbar = () => {
             zIndex: 20,
             boxSizing: 'border-box'
         }}>
-            <div style={{ fontSize: '24px', fontWeight: '700', color: '#003366', cursor: 'pointer' }} onClick={() => navigate('/')}>LEGOL</div>
+            <div
+                style={{ fontSize: '24px', fontWeight: '700', color: '#003366', cursor: 'pointer' }}
+                onClick={() => navigate('/')}
+            >
+                LEGOL
+            </div>
 
             <div style={{
                 background: 'rgba(230, 235, 240, 0.6)',
@@ -129,7 +35,7 @@ const Navbar = () => {
                 display: 'flex',
                 gap: '4px'
             }}>
-                {['Home', 'Chat', 'Timeline', 'Resources'].map((item) => (
+                {navItems.map((item) => (
                     <div key={item}
                         onClick={() => {
                             if (item === 'Home') navigate('/');
@@ -141,21 +47,21 @@ const Navbar = () => {
                             padding: '10px 24px',
                             borderRadius: '100px',
                             fontSize: '14px',
-                            fontWeight: item === 'Timeline' ? '600' : '500',
-                            color: item === 'Timeline' ? '#003366' : '#64748b',
+                            fontWeight: item === activePage ? '600' : '500',
+                            color: item === activePage ? '#003366' : '#64748b',
                             cursor: 'pointer',
-                            background: item === 'Timeline' ? '#FFFFFF' : 'transparent',
-                            boxShadow: item === 'Timeline' ? '0 2px 4px rgba(0,0,0,0.05)' : 'none',
+                            background: item === activePage ? '#FFFFFF' : 'transparent',
+                            boxShadow: item === activePage ? '0 2px 4px rgba(0,0,0,0.05)' : 'none',
                             transition: 'all 0.3s ease'
                         }}
                         onMouseEnter={(e) => {
-                            if (item !== 'Timeline') {
+                            if (item !== activePage) {
                                 e.currentTarget.style.color = '#003366';
                                 e.currentTarget.style.background = 'rgba(255,255,255,0.5)';
                             }
                         }}
                         onMouseLeave={(e) => {
-                            if (item !== 'Timeline') {
+                            if (item !== activePage) {
                                 e.currentTarget.style.color = '#64748b';
                                 e.currentTarget.style.background = 'transparent';
                             }
@@ -200,90 +106,388 @@ const Navbar = () => {
     );
 };
 
+/* ─── Timeline Item ─── */
+const TimelineItem = ({ item, isLast, isCompleted }) => {
+    return (
+        <div style={{ display: 'flex', gap: '20px', position: 'relative' }}>
+            {/* Vertical line */}
+            {!isLast && (
+                <div style={{
+                    position: 'absolute',
+                    left: '15px',
+                    top: '50px',
+                    width: '2px',
+                    height: 'calc(100% - 50px)',
+                    background: 'rgba(0, 51, 102, 0.15)'
+                }} />
+            )}
+
+            {/* Icon circle */}
+            <div style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                background: isCompleted ? '#28a745' : 'rgba(0, 51, 102, 0.1)',
+                border: `2px solid ${isCompleted ? '#28a745' : 'rgba(0, 51, 102, 0.2)'}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                zIndex: 10,
+                marginTop: '2px'
+            }}>
+                {isCompleted
+                    ? <CheckCircle size={20} color="white" />
+                    : <Clock size={18} color="#003366" />
+                }
+            </div>
+
+            {/* Content */}
+            <div style={{ flex: 1, paddingTop: '4px', paddingBottom: '24px' }}>
+                <h3 style={{
+                    margin: '0 0 8px 0',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    color: '#1E272D'
+                }}>
+                    {item.title}
+                </h3>
+                <p style={{
+                    margin: '0 0 12px 0',
+                    fontSize: '14px',
+                    color: '#64748b',
+                    lineHeight: '1.5'
+                }}>
+                    {item.description}
+                </p>
+                {item.dueDate && (
+                    <div style={{
+                        fontSize: '13px',
+                        color: '#dc3545',
+                        fontWeight: '500',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                    }}>
+                        <AlertCircle size={14} />
+                        Due: {item.dueDate}
+                    </div>
+                )}
+                {item.relatedDocuments && item.relatedDocuments.length > 0 && (
+                    <div style={{ marginTop: '12px', paddingLeft: '12px', borderLeft: '2px solid rgba(0, 51, 102, 0.1)' }}>
+                        <span style={{ fontSize: '12px', fontWeight: '600', color: '#003366', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            Resources:
+                        </span>
+                        <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                            {item.relatedDocuments.map((doc, idx) => (
+                                <span key={idx} style={{
+                                    fontSize: '12px',
+                                    background: 'rgba(0, 51, 102, 0.08)',
+                                    color: '#003366',
+                                    padding: '4px 10px',
+                                    borderRadius: '6px'
+                                }}>
+                                    {doc}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+/* ─── Helper: Extract milestones from actual chat content ─── */
+const extractMilestones = (messages, studentCountry, institution, topic) => {
+    const extracted = [];
+    const seen = new Set();
+
+    // Combine all assistant responses to analyze
+    const assistantResponses = messages
+        .filter(msg => msg.role === 'assistant')
+        .map(msg => msg.text.toLowerCase())
+        .join('\n');
+
+    const userMessages = messages
+        .filter(msg => msg.role === 'user')
+        .map(msg => msg.text.toLowerCase())
+        .join('\n');
+
+    const allText = assistantResponses + '\n' + userMessages;
+
+    // Comprehensive milestone patterns - includes immigration, financial, documents, etc
+    const milestonePatterns = [
+        {
+            keywords: ['f-1', 'f1 student', 'student visa', 'opt', 'practical training'],
+            title: 'F-1 Student Visa',
+            description: 'Complete F-1 student visa requirements and documentation',
+            relatedDocuments: ['Passport', 'I-20 Form', 'Financial Documentation', 'SEVIS Fee Receipt'],
+            category: 'visa'
+        },
+        {
+            keywords: ['work visa', 'h-1b', 'employment visa', 'sponsor', 'work authorization'],
+            title: 'Secure Work Visa',
+            description: 'Obtain employer sponsorship and file for work visa (H-1B or similar)',
+            relatedDocuments: ['Employment Letter', 'Job Offer', 'H-1B Petition', 'Passport'],
+            category: 'visa'
+        },
+        {
+            keywords: ['green card', 'permanent resident', 'i-485', 'permanent residency', 'green card'],
+            title: 'Apply for Green Card',
+            description: 'File for permanent residency status',
+            relatedDocuments: ['I-485 Form', 'Medical Exam (I-693)', 'Birth Certificate', 'Marriage Certificate'],
+            category: 'visa'
+        },
+        {
+            keywords: ['naturalization', 'citizenship', 'form n-400', 'citizen'],
+            title: 'File for Citizenship',
+            description: 'Complete naturalization application and take citizenship test',
+            relatedDocuments: ['Form N-400', 'Birth Certificate', 'Passport', 'Green Card'],
+            category: 'visa'
+        },
+        {
+            keywords: ['financial support', 'financial aid', 'scholarship', 'fafsa', 'loans', 'grants', 'tuition'],
+            title: 'Secure Financial Support',
+            description: 'Explore scholarships, grants, federal aid, and loans to fund your education',
+            relatedDocuments: ['FAFSA Application', 'Scholarship Applications', 'Bank Statements', 'Tax Returns', 'CMU Financial Aid Forms'],
+            category: 'financial'
+        },
+        {
+            keywords: ['background check', 'fbi', 'criminal', 'police clearance'],
+            title: 'Complete Background Check',
+            description: 'Pass FBI criminal background check and police clearance',
+            relatedDocuments: ['FBI Background Check', 'Police Clearance Certificate'],
+            category: 'documents'
+        },
+        {
+            keywords: ['tax return', 'irs', 'income tax', '1040', 'tax documentation'],
+            title: 'Submit Tax Documentation',
+            description: 'File required federal tax returns and transcripts',
+            relatedDocuments: ['Tax Returns (Last 5 Years)', 'W-2 Forms', 'IRS Transcripts'],
+            category: 'documents'
+        },
+        {
+            keywords: ['marriage certificate', 'spouse', 'married', 'dependent'],
+            title: 'Verify Marriage Documentation',
+            description: 'Submit certified marriage certificate if applicable',
+            relatedDocuments: ['Marriage Certificate', 'Spouse Passport', 'Birth Certificate'],
+            category: 'documents'
+        },
+        {
+            keywords: ['medical exam', 'i-693', 'vaccination', 'physical', 'health check'],
+            title: 'Complete Medical Examination',
+            description: 'Get required medical exam by USCIS-approved physician',
+            relatedDocuments: ['Medical Exam (I-693)', 'Vaccination Records', 'Birth Certificate'],
+            category: 'documents'
+        },
+        {
+            keywords: ['employment verification', 'employment letter', 'job offer'],
+            title: 'Obtain Employment Verification',
+            description: 'Get official letter from current or prospective employer',
+            relatedDocuments: ['Employment Letter', 'Job Offer Letter', 'Company Registration'],
+            category: 'documents'
+        }
+    ];
+
+    // Check if milestones are mentioned in the conversation
+    milestonePatterns.forEach(pattern => {
+        const mentioned = pattern.keywords.some(keyword => allText.includes(keyword));
+
+        if (mentioned && !seen.has(pattern.title)) {
+            extracted.push({
+                ...pattern,
+                completed: false
+            });
+            seen.add(pattern.title);
+        }
+    });
+
+    // Add personalization header if user provided context
+    if (studentCountry && institution) {
+        const header = {
+            title: `Immigration & Education Plan for ${studentCountry}`,
+            description: `International student from ${studentCountry} studying at ${institution}. Your personalized action items below.`,
+            relatedDocuments: [],
+            completed: false,
+            isHeader: true
+        };
+        extracted.unshift(header);
+    }
+
+    // Default message if nothing extracted
+    if (extracted.length === 0 || (extracted.length === 1 && extracted[0].isHeader)) {
+        return [
+            {
+                title: 'Start Your Immigration Journey',
+                description: 'Chat with LEGOL to understand your visa, financial aid, and immigration requirements. Ask about your situation and we\'ll create a personalized timeline.',
+                relatedDocuments: [],
+                completed: false
+            }
+        ];
+    }
+
+    return extracted;
+};
+
+/* ─── Main Timeline Page ─── */
 const Timeline = () => {
-    const [activeTab, setActiveTab] = useState('All Events');
-    const tabs = ['All Events', 'Documents', 'Applications', 'Appointments', 'Visa', 'Milestones'];
+    const navigate = useNavigate();
+    const { messages, studentCountry, institution, topic } = useChatContext();
+
+    // Extract milestones based on actual chat content
+    const milestones = useMemo(() => {
+        return extractMilestones(messages, studentCountry, institution, topic);
+    }, [messages, studentCountry, institution, topic]);
 
     return (
-        <div style={{ minHeight: '100vh', background: '#F6F8FA', position: 'relative', overflow: 'hidden' }}>
-
-            {/* Background Graphic */}
+        <div style={{
+            height: '100vh',
+            background: '#EEF2F7',
+            position: 'relative',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column'
+        }}>
+            {/* Background Gradient Blobs */}
             <div style={{
                 position: 'absolute',
-                top: 0,
-                right: 0,
-                width: '60vw',
-                height: '100vh',
-                background: 'linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(0,51,102,0.05) 50%, rgba(0,51,102,0.1) 100%)',
-                clipPath: 'polygon(20% 0, 100% 0, 100% 100%, 0% 100%)',
+                top: '-5%',
+                left: '10%',
+                width: '80vw',
+                height: '70vh',
+                background: 'radial-gradient(ellipse, rgba(0, 51, 102, 0.18) 0%, rgba(0, 51, 102, 0.08) 40%, transparent 70%)',
+                filter: 'blur(60px)',
                 zIndex: 0
             }} />
             <div style={{
                 position: 'absolute',
-                top: '-10%',
-                right: '-10%',
-                width: '80vw',
-                height: '80vh',
-                background: 'radial-gradient(circle, rgba(0, 51, 102, 0.2) 0%, rgba(255, 255, 255, 0) 70%)',
+                top: '30%',
+                left: '25%',
+                width: '50vw',
+                height: '50vh',
+                background: 'radial-gradient(ellipse, rgba(100, 140, 200, 0.15) 0%, transparent 70%)',
                 filter: 'blur(80px)',
                 zIndex: 0
             }} />
+            <div style={{
+                position: 'absolute',
+                bottom: '0',
+                left: '0',
+                right: '0',
+                height: '40vh',
+                background: 'linear-gradient(to top, rgba(220, 228, 240, 0.6), transparent)',
+                zIndex: 0
+            }} />
 
-            <Navbar />
+            <Navbar activePage="Timeline" />
 
-            <main style={{ position: 'relative', zIndex: 10, maxWidth: '1000px', margin: '0 auto', paddingTop: '160px', paddingLeft: '20px', paddingRight: '20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
-                    <div style={{ background: '#003366', padding: '12px', borderRadius: '12px', color: 'white' }}>
-                        <Calendar size={32} />
-                    </div>
-                    <h1 style={{ fontSize: '48px', fontWeight: '400', color: '#003366', margin: 0 }}>Timeline Planner</h1>
+            {/* ─── Main Content ─── */}
+            <div style={{
+                flex: 1,
+                position: 'relative',
+                zIndex: 10,
+                paddingTop: '110px',
+                paddingBottom: '32px',
+                paddingLeft: '64px',
+                paddingRight: '64px',
+                maxWidth: '1000px',
+                width: '100%',
+                margin: '0 auto',
+                boxSizing: 'border-box',
+                overflow: 'hidden'
+            }}>
+                {/* Header */}
+                <div style={{ marginBottom: '48px' }}>
+                    <h1 style={{
+                        margin: '0 0 12px 0',
+                        fontSize: '36px',
+                        fontWeight: '700',
+                        color: '#003366'
+                    }}>
+                        Your Immigration Timeline
+                    </h1>
+                    <p style={{
+                        margin: 0,
+                        fontSize: '16px',
+                        color: '#64748b'
+                    }}>
+                        {studentCountry && institution
+                            ? `${studentCountry} student • ${institution}`
+                            : 'Chat to personalize your timeline'}
+                    </p>
                 </div>
-                <p style={{ fontSize: '18px', color: '#64748b', marginBottom: '40px', marginLeft: '72px' }}>
-                    Track your immigration journey with a personalized timeline of important milestones and deadlines.
-                </p>
 
-                {/* Filter Tabs */}
-                <div style={{ display: 'flex', gap: '12px', marginBottom: '48px', flexWrap: 'wrap', marginLeft: '72px' }}>
-                    {tabs.map(tab => (
-                        <button key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            style={{
-                                padding: '12px 24px',
-                                borderRadius: '12px',
-                                border: 'none',
-                                background: activeTab === tab ? '#003366' : '#FFFFFF',
-                                color: activeTab === tab ? '#FFFFFF' : '#64748b',
-                                fontSize: '14px',
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-                                transition: 'all 0.2s'
+                {/* Timeline */}
+                <div style={{
+                    overflowY: 'auto',
+                    paddingRight: '12px',
+                    maxHeight: 'calc(100vh - 260px)'
+                }}>
+                    <div style={{
+                        background: 'rgba(255, 255, 255, 0.75)',
+                        backdropFilter: 'blur(12px)',
+                        borderRadius: '24px',
+                        padding: '40px 36px',
+                        boxShadow: '0 4px 20px rgba(0, 51, 102, 0.06), inset 0 1px 0 rgba(255,255,255,0.8)'
+                    }}>
+                        {milestones.map((milestone, idx) => (
+                            <TimelineItem
+                                key={idx}
+                                item={milestone}
+                                isLast={idx === milestones.length - 1}
+                                isCompleted={milestone.completed}
+                            />
+                        ))}
+
+                        {/* CTA at bottom */}
+                        <div style={{
+                            marginTop: '32px',
+                            paddingTop: '32px',
+                            borderTop: '1px solid rgba(0, 51, 102, 0.1)',
+                            textAlign: 'center'
+                        }}>
+                            <p style={{
+                                margin: '0 0 16px 0',
+                                fontSize: '15px',
+                                color: '#64748b'
                             }}>
-                            {tab}
-                        </button>
-                    ))}
+                                Want to update your timeline?
+                            </p>
+                            <button
+                                onClick={() => navigate('/chat')}
+                                style={{
+                                    padding: '12px 28px',
+                                    background: '#003366',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '12px',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    boxShadow: '0 4px 12px rgba(0, 51, 102, 0.2)',
+                                    transition: 'all 0.2s ease',
+                                    fontFamily: 'inherit'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 51, 102, 0.3)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 51, 102, 0.2)';
+                                }}
+                            >
+                                Go to Chat
+                                <ChevronRight size={16} />
+                            </button>
+                        </div>
+                    </div>
                 </div>
-
-                {/* Timeline Events */}
-                <div style={{ paddingLeft: '50px' }}>
-                    <TimelineEvent
-                        status="COMPLETED"
-                        title="Gather Birth Certificate"
-                        date="Feb 1, 2026"
-                        location="Vital Records Office"
-                        description="Original birth certificate obtained and certified"
-                    />
-
-                    <TimelineEvent
-                        status="CURRENT"
-                        title="Submit Citizenship Application"
-                        date="Feb 7, 2026"
-                        location="USCIS"
-                        description="Complete Form N-400 and submit to USCIS"
-                        isLast={true}
-                    />
-                </div>
-            </main>
+            </div>
         </div>
     );
 };

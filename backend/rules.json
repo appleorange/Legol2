@@ -1,0 +1,83 @@
+{
+  "rules": [
+    {
+      "id": "f1_military_termination",
+      "name": "F-1 Status Terminates (Military > 5 months)",
+      "scenario": "f1_military_loa",
+      "condition": {
+        "visa_type": "F-1",
+        "military_service_months": { "gt": 5 }
+      },
+      "consequence": {
+        "action": "F-1 status terminates",
+        "requires": "notify_oie"
+      },
+      "source": "8 CFR 214.2(f)(5)",
+      "source_url": "https://www.law.cornell.edu/cfr/text/8/214.2",
+      "deadline_days": 30,
+      "deadline_description": "Notify CMU OIE within 30 days of military service start"
+    },
+    {
+      "id": "oie_notification",
+      "name": "Notify CMU OIE of Military Leave",
+      "condition": {
+        "visa_type": "F-1",
+        "military_service": true
+      },
+      "consequence": {
+        "action": "Contact CMU OIE",
+        "timeline": "Within 30 days"
+      },
+      "source": "CMU OIE Policy",
+      "source_url": "https://www.cmu.edu/oie/",
+      "depends_on": ["f1_military_termination"]
+    },
+    {
+      "id": "sevis_termination",
+      "name": "SEVIS Record Termination",
+      "condition": {
+        "oie_notified": true,
+        "military_service": true
+      },
+      "consequence": {
+        "action": "SEVIS record auto-terminates",
+        "timeline": "2-3 business days after OIE notification"
+      },
+      "source": "SEVIS Rules",
+      "source_url": "https://www.sevis.ice.gov/",
+      "depends_on": ["oie_notification"]
+    },
+    {
+      "id": "f1_opt_eligibility",
+      "name": "F-1 Graduate Eligible for OPT",
+      "condition": {
+        "visa_type": "F-1",
+        "status": "graduated"
+      },
+      "consequence": {
+        "action": "Apply for OPT",
+        "timeline": "12-36 months work authorization"
+      },
+      "source": "8 CFR 214.2(f)(10)",
+      "source_url": "https://www.uscis.gov/",
+      "deadline_days": 60,
+      "deadline_description": "Must apply for OPT within 60 days of graduation"
+    },
+    {
+      "id": "h1b_eligibility",
+      "name": "H-1B Sponsorship Eligibility",
+      "condition": {
+        "visa_type": "F-1",
+        "opt_approved": true,
+        "employer_sponsoring": true
+      },
+      "consequence": {
+        "action": "Employer files H-1B petition",
+        "timeline": "March filing for October start"
+      },
+      "source": "8 CFR 214.2(h)(1)",
+      "source_url": "https://www.uscis.gov/",
+      "depends_on": ["f1_opt_eligibility"]
+    }
+  ]
+}

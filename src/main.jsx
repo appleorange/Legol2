@@ -8,6 +8,7 @@ import Timeline from './components/Timeline.jsx'
 import Chat from './components/Chat.jsx'
 import Resources from './components/Resources.jsx'
 import Login from './components/Login.jsx'
+import { ChatProvider } from './context/ChatContext'
 
 const pageVariants = {
   initial: { opacity: 0, y: 12 },
@@ -32,8 +33,10 @@ function AnimatedRoutes() {
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
-      <AnimatedRoutes />
-    </BrowserRouter>
+    <ChatProvider>
+      <BrowserRouter>
+        <AnimatedRoutes />
+      </BrowserRouter>
+    </ChatProvider>
   </StrictMode>,
 )

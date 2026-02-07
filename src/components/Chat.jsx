@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Send, ChevronDown, ChevronUp, CheckCircle, AlertCircle, Paperclip, X } from 'lucide-react';
 import { api } from '../api';
+import { useChatContext } from '../context/ChatContext';
 
 /* ─── Navbar ─── */
 const Navbar = ({ activePage = 'Chat' }) => {
@@ -437,21 +438,16 @@ const DocumentCard = ({ doc }) => {
 /* ─── Main Chat Page ─── */
 const Chat = () => {
     const [query, setQuery] = useState('');
-    const [messages, setMessages] = useState([
-        {
-            role: 'assistant',
-            text: "Hello! I\u2019m your LEGOL immigration assistant. I can help answer questions about dual citizenship, work visas, document requirements, and more. How can I assist you today?"
-        }
-    ]);
     const [isLoading, setIsLoading] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(null);
     const [activeCategory, setActiveCategory] = useState('All Documents');
     const [isDragOver, setIsDragOver] = useState(false);
     const [isChatDragOver, setIsChatDragOver] = useState(false);
     const [uploadedFiles, setUploadedFiles] = useState([]);
-    const [studentCountry, setStudentCountry] = useState('Singapore');
-    const [institution, setInstitution] = useState('Carnegie Mellon University');
-    const [topic, setTopic] = useState(null);
+    
+    // Use global chat context
+    const { messages, setMessages, studentCountry, setStudentCountry, institution, setInstitution, topic, setTopic } = useChatContext();
+    
     const inputRef = useRef(null);
     const fileInputRef = useRef(null);
     const chatColumnRef = useRef(null);
@@ -489,7 +485,6 @@ const Chat = () => {
                     ? `${userMessage}\n\n[Uploaded files: ${fileNames}]`
                     : `[Uploaded files: ${fileNames}]`;
 
-                // Store file contents for sending to Claude
                 fileContents = uploadResult.files;
             } catch (err) {
                 console.error('File upload failed:', err);
@@ -690,7 +685,7 @@ const Chat = () => {
                 overflow: 'hidden'
             }}>
 
-                {/* ─── LEFT: Chat Column (full drop zone) ─── */}
+                {/* ─── LEFT: Chat Column ─── */}
                 <div
                     ref={chatColumnRef}
                     onDragEnter={handleChatDragEnter}
