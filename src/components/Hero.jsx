@@ -28,11 +28,11 @@ const Navbar = () => {
                 display: 'flex',
                 gap: '4px'
             }}>
-                {['Home', 'Documents', 'Timeline', 'Resources'].map((item, i) => (
+                {['Home', 'Chat', 'Timeline', 'Resources'].map((item, i) => (
                     <div key={item}
                         onClick={() => {
                             if (item === 'Timeline') navigate('/timeline');
-                            if (item === 'Home') navigate('/');
+                            if (item === 'Home' || item === 'Chat') navigate('/');
                         }}
                         style={{
                             padding: '10px 24px',

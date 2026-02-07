@@ -129,9 +129,9 @@ const Navbar = () => {
                 display: 'flex',
                 gap: '4px'
             }}>
-                {['Home', 'Documents', 'Timeline', 'Resources'].map((item, i) => (
+                {['Home', 'Chat', 'Timeline', 'Resources'].map((item, i) => (
                     <div key={item}
-                        onClick={() => item === 'Home' ? navigate('/') : null}
+                        onClick={() => (item === 'Home' || item === 'Chat') ? navigate('/') : null}
                         style={{
                             padding: '10px 24px',
                             borderRadius: '100px',
