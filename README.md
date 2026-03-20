@@ -1,39 +1,30 @@
 # Legol
+A web platform that consolidates fragmented legal documents across government agencies, universities, and foreign regulations into interactive knowledge graphs and timelines for international students.
 
-# Getting Started
+## Features
+- **Interactive Knowledge Graphs & Flowcharts:** Built modular frontend components to visualize dependencies between agency requirements.  
+- **Timeline Planner:** Implemented backend logic to calculate deadlines and dependencies from structured legal data.  
+- **Chat Interface:** Developed a real-time Q&A system connecting natural-language queries to structured document data.  
+- **Conflict Detection Engine:** Automated identification of contradictory rules and suggested resolutions using backend graph algorithms.  
+- **Secure Authentication & Deployment:** Google login via Firebase and full deployment on Vercel for production access.
 
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Set up Firebase Authentication (for Google Sign-In):
-   - Go to [Firebase Console](https://console.firebase.google.com/)
-   - Create a new project or select an existing one
-   - Enable Google Authentication:
-     - Go to Authentication > Sign-in method
-     - Enable Google provider
-   - Get your Firebase configuration:
-     - Go to Project Settings > General
-     - Scroll down to "Your apps" and click on the web app (or create one)
-     - Copy the Firebase configuration values
-   - Create a `.env` file in the root directory (copy from `.env.example`)
-   - Add your Firebase configuration values to the `.env` file
-4. Run the dev server: `npm run dev`
-5. Open your browser to the URL shown in terminal (usually http://localhost:5173) (This runs the frontend - which is the website we display for the demo)
-6. To run the backend: `cd backend && source venv/bin/activate && python app.py` (you need to run both servers for the chatbot to work) 
+## Tech Stack
+- **Frontend:** React.js, Vite, CSS
+- **Backend:** Python, Flask, Firebase for authentication
+- **Database/Storage:** JSON-based document store, structured graph storage
+- **Deployment:** Vercel
 
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
- 
+## Installation
+1. Clone repo: `git clone https://github.com/appleorange/Legol.git`
+2. Install frontend dependencies:
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+3. Install backend dependencies:
+   cd backend
+   python -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   python app.py
+4.	Open browser at http://localhost:5173 to run locally.
