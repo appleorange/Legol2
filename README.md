@@ -22,9 +22,10 @@ A web platform that consolidates fragmented legal documents across government ag
    npm install
    npm run dev
 3. Install backend dependencies:
+   ```bash
    cd backend
    python -m venv venv
    source venv/bin/activate
    pip install -r requirements.txt
    python app.py
-4.	Open browser at http://localhost:5173 to run locally.
+5.	Open browser at http://localhost:5173 to run locally.
